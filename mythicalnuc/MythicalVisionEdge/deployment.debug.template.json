@@ -1,0 +1,199 @@
+{
+  "$schema-template": "4.0.0",
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.1",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "mythicalcon": {
+                "username": "${ACR_USER}",
+                "password": "${ACR_PASSWORD}",
+                "address": "${ACR_ADDRESS}"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.4",
+              "createOptions": {}
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.4",
+              "createOptions": {
+                "HostConfig": {
+                  "PortBindings": {
+                    "5671/tcp": [
+                      {
+                        "HostPort": "5671"
+                      }
+                    ],
+                    "8883/tcp": [
+                      {
+                        "HostPort": "8883"
+                      }
+                    ],
+                    "443/tcp": [
+                      {
+                        "HostPort": "443"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "MythicalScissorsActionRules": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.MythicalScissorsActionRules.debug}",
+              "createOptions": {
+                "ExposedPorts": {
+                  "5678/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "5678/tcp": [
+                      {
+                        "HostPort": "5678"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "SimulatedTemperatureSensor": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.4",
+              "createOptions": {}
+            }
+          },
+          "MythicalScissorsObjDetection": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.MythicalScissorsObjDetection.debug}",
+              "createOptions": {
+                "ExposedPorts": {
+                  "80/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "8080/tcp": [
+                      {
+                        "HostPort": "8080"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "RTSPImageCapturePY": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.RTSPImageCapturePY.debug}",
+              "createOptions": {}
+            },
+            "env": {
+              "EDGE_CAMERA_URL": {
+                "value": "${RTSP_URL}"
+              },
+              "EDGE_BLOB_CONN_STRING": {
+                "value": "${EDGE_BLOB_CONN_STRING}"
+              },
+              "EDGE_BLOB_CONTAINER_NAME": {
+                "value": "${EDGE_BLOB_CONTAINER_NAME}"
+              },
+              "EDGE_INFERENCE_URL": {
+                "value": "${EDGE_INFERENCE_URL}"
+              },
+              "SLEEP_TIME": {
+                "value": "5"
+              }
+            }            
+          },
+          "azureblobstorageoniotedge": {
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "factorystore"
+              },
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "vcjwid76cp2Tk1XMvHfD94tW9wGC6ooBpkj+2I0di5gMV5VjAqxMeSxrNcpc1+1W5aQORY2bMSumGYNnpXoRJA=="
+              }
+            },
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azure-blob-storage",
+              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"11002/tcp\":[{\"HostPort\":\"11002\"}]},\"Binds\":[\"/blobroot:/blobroot\"]}}"
+            },
+            "status": "running",
+            "type": "docker"
+          }          
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.1",
+        "routes": {
+          "MythicalScissorsActionRulesToIoTHub": "FROM /messages/modules/MythicalScissorsActionRules/outputs/* INTO $upstream",
+          "RTSPImageCapturePYToIoTHub": "FROM /messages/modules/RTSPImageCapturePY/outputs/* INTO $upstream"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    },
+    "azureblobstorageoniotedge": {
+      "properties.desired": {
+        "deviceAutoDeleteProperties": {
+          "deleteOn": false,
+          "deleteAfterMinutes": 1,
+          "retainWhileUploading": true
+        },
+        "deviceToCloudUploadProperties": {
+          "uploadOn": true,
+          "uploadOrder": "OldestFirst",
+          "cloudStorageConnectionString": "${CLOUD_BLOB_CONN_STRING}",
+          "storageContainersForUpload": {
+            "factory": {
+              "target": "factory"
+            },
+            "scissors": {
+              "target": "scissors"
+            }
+          },
+          "deleteAfterUpload": true
+        }
+      }
+    }    
+  }
+}

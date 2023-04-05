@@ -1,0 +1,6 @@
+imutils==0.5.4
+Pillow==9.4.0
+azure-storage-blob
+numpy
+opencv-python
+azure-iot-device~=2.7.0

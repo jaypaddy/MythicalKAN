@@ -1,0 +1,132 @@
+{
+  "$schema-template": "4.0.0",
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.4",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {}
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.4",
+              "createOptions": {}
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.4",
+              "createOptions": {
+                "HostConfig": {
+                  "PortBindings": {
+                    "5671/tcp": [
+                      {
+                        "HostPort": "5671"
+                      }
+                    ],
+                    "8883/tcp": [
+                      {
+                        "HostPort": "8883"
+                      }
+                    ],
+                    "443/tcp": [
+                      {
+                        "HostPort": "443"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "MythicalScissorsActionRules": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.MythicalScissorsActionRules}",
+              "createOptions": {}
+            }
+          },
+          "target-runtime-kan-agent": {
+            "env": {
+              "AZURE_CLIENT_ID": {
+                "value": "701ddc6c-da88-4b49-852b-d83d3077bb28"
+              },
+              "AZURE_CLIENT_SECRET": {
+                "value": "4CN8Q~8pMDIO2HRk2-JEAJrvEDkSnnDXYBqEvbs~"
+              },
+              "AZURE_TENANT_ID": {
+                "value": "16b3c013-d300-468d-ac64-7eda0820b6d3"
+              },
+              "KAN_AGENT_ADDRESS": {
+                "value": "target-runtime-kan-agent"
+              },
+              "KAN_URL": {
+                "value": "http://20.118.95.160:8080/v1alpha2/agent/references"
+              },
+              "KAN_VERSION_SALT": {
+                "value": "6ee5169f-f4cc-4ed1-b510-696fd4bc6085"
+              },
+              "SNAPSHOT_ROOT": {
+                "value": "/snapshots"
+              },
+              "STORAGE_ACCOUNT": {
+                "value": "mythicalisafactorystore"
+              },
+              "STORAGE_CONTAINER": {
+                "value": "kanvision"
+              },
+              "TARGET_NAME": {
+                "value": "target-04b5e7f1-3d28-409d-964d-7c36a7fa91d4"
+              }
+            },
+            "restartPolicy": "always",
+            "settings": {
+              "image": "kanprod.azurecr.io/kan-agent:0.41.40",
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/etc/iotedge/storage:/snapshots\"],\"LogConfig\":{\"Type\":\"json-file\",\"Config\":{\"max-size\":\"10m\",\"max-file\":\"10\"}}}}"
+            },
+            "status": "running",
+            "type": "docker",
+            "version": "1.0"
+          },
+          "SimulatedTemperatureSensor": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.4",
+              "createOptions": {}
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.4",
+        "routes": {
+          "MythicalScissorsActionRulesToIoTHub": "FROM /messages/modules/MythicalScissorsActionRules/outputs/* INTO $upstream",
+          "sensorToMythicalScissorsActionRules": "FROM /messages/modules/SimulatedTemperatureSensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/MythicalScissorsActionRules/inputs/input1\")"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}
