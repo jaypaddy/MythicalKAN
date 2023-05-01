@@ -1,0 +1,6 @@
+.pytest_cache
+*cache*/ 
+*__pycache__/
+.coverage
+coverages.xml
+junit/

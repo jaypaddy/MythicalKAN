@@ -1,0 +1,52 @@
+{
+    "created": "2023-03-26T16:45:33.086163",
+    "id": "",
+    "iteration": "",
+    "predictions": [
+        {
+            "boundingBox": {
+                "height": 0.93838805,
+                "left": 0.05128171,
+                "top": -0.02009174,
+                "width": 0.20226111
+            },
+            "probability": 0.90529263,
+            "tagId": 2,
+            "tagName": "YellowHandlePinkWing"
+        },
+        {
+            "boundingBox": {
+                "height": 0.91946181,
+                "left": 0.72893717,
+                "top": 0.00995904,
+                "width": 0.24337494
+            },
+            "probability": 0.81845701,
+            "tagId": 1,
+            "tagName": "RedHandleYellowWing"
+        },
+        {
+            "boundingBox": {
+                "height": 0.35897722,
+                "left": 0.32131848,
+                "top": 0.46402898,
+                "width": 0.39927256
+            },
+            "probability": 0.76267725,
+            "tagId": 0,
+            "tagName": "GreenHandleRedWing"
+        },
+        {
+            "boundingBox": {
+                "height": 0.88197927,
+                "left": 0.71015349,
+                "top": 0.091992,
+                "width": 0.27735753
+            },
+            "probability": 0.16362345,
+            "tagId": 2,
+            "tagName": "YellowHandlePinkWing"
+        }
+    ],
+    "project": ""
+}

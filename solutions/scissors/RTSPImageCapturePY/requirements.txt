@@ -1,0 +1,10 @@
+imutils==0.5.4
+Pillow==9.4.0
+azure-storage-blob
+numpy
+opencv-python
+python-dotenv
+grpcio==1.47.0
+grpcio-tools==1.47.0
+protobuf==3.20.2
+prometheus-client==0.14.1

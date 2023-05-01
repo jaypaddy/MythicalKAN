@@ -1,0 +1,5 @@
+grpcio==1.47.0
+grpcio-tools==1.47.0
+protobuf==3.20.2
+prometheus-client==0.14.1
+python-dotenv
