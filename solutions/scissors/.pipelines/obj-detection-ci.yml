@@ -1,0 +1,89 @@
+# build, test (to be built) and push to container registry
+
+trigger:
+  branches:
+    include:
+      - main  
+  paths:
+    include:
+      - solutions/scissors/MythicalScissorsObjDetection
+      - solutions/scissors/.pipelines/obj-detection-ci.yml
+
+variables:
+  imageRepository: "scissors/mythicalxobjdetection"
+  imageTag: '$(Build.BuildId)'
+  workingDir: '$(Build.SourcesDirectory)/solutions/scissors/MythicalScissorsObjDetection'
+  unittest_reportprefix: 'mythicalxobjdetection'
+  pythonversion: '3.9'
+  srcRepoName: "MythicalKAN"
+  opsRepoName: "MythicalArcOps"
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - checkout: self
+
+  - task: AzureKeyVault@2
+    inputs:
+      azureSubscription: 'Mythical-JAYPADDY-LAB'
+      KeyVaultName: 'mythicalarcopskv'
+      SecretsFilter: '*'
+      RunAsPreJob: true
+
+  - script: echo "Building App :${{ variables.imageRepository }}"
+    displayName: 'Run CICD'
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '${{variables.pythonversion}}'
+    displayName: 'Use Python ${{variables.pythonversion}}'
+
+  - script: |
+      python -m pip install --upgrade pip
+    displayName: 'pip install upgrade'
+
+  - script: |
+      pip install pytest pytest-azurepipelines
+      pip install pytest-cov
+    displayName: 'install pytest'
+
+  - script: |
+      pip install -r requirements.txt
+    displayName: 'install requirements.txt'
+    workingDirectory: ${{ variables.workingDir }}
+
+ 
+  - script: |
+      python -m pytest \
+      --junitxml=$(Common.TestResultsDirectory)/${{ variables.unittest_reportprefix }}_unittest-results.xml \
+      --cov=. \
+      --verbose \
+      --cov-report=xml:$(Common.TestResultsDirectory)/${{ variables.unittest_reportprefix }}_coverage.xml .
+    displayName: 'Run unit tests'
+    workingDirectory: ${{ variables.workingDir }}
+
+  - task: PublishTestResults@2
+    displayName: 'Publish unit test results'
+    inputs:
+      testResultsFiles: '**/*_unittest-results.xml'
+      testRunTitle: 'Unit tests'
+      failTaskOnFailedTests: true
+      searchFolder: $(Common.TestResultsDirectory)
+
+  - task: Docker@2
+    displayName: 'Build docker images'
+    name: dockerBuild
+    inputs:
+      containerRegistry: mythicalconACRServiceConnection
+      repository: ${{ variables.imageRepository }}
+      command: 'buildAndPush'
+      Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+
+  - task: Bash@3
+    displayName: 'Display Container name with Tag'
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo "Container built: $(mythicalconACRServiceConnection)/${{ variables.imageRepository }}:${{ variables.imageTag }}"
+

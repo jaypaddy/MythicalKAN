@@ -1,5 +1,8 @@
 import os
 from metrics import GaugeMetric, CounterMetric
+from dotenv import load_dotenv
+load_dotenv()
+
 
 LOGGING_LEVEL = os.getenv('LOGGING_LEVEL', "INFO").upper()
 app_name = os.getenv('APP_NAME', "mythicalapp")

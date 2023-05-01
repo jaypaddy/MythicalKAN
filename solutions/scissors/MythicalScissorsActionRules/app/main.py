@@ -2,7 +2,6 @@ import logging
 import logging.config
 import os
 from JSONFormatter import JSONFormatter
-from dotenv import load_dotenv
 import threading
 import time
 from metrics import GaugeMetric, CounterMetric, start_metrics_server
@@ -10,7 +9,6 @@ from env import scope_keys, scope_values, app_name, sleep_time, prometheus_port
 from env import cmetric, gmetric
 
 
-load_dotenv()
 
 def main():
     try:

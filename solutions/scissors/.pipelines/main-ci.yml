@@ -1,0 +1,34 @@
+trigger:
+  branches:
+    include:
+      - main  
+  paths:
+    include:
+      - solutions/scissors/MythicalScissorsActionRules
+      - solutions/scissors/MythicalScissorsObjDetection
+      - solutions/scissors/RTSPImageCapturePY
+      - solutions/scissors/.pipelines/action-rules-ci.yml
+      - solutions/scissors/.pipelines/obj-detection-ci.yml
+      - solutions/scissors/.pipelines/rtsp-imgcapture-ci.yml
+stages:
+  - stage: dev
+    displayName: 'Dev Environment CI'
+    condition: or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.Reason'], 'Manual'))
+    variables:
+      - template: ../variables/dev.yml
+      - group: dev_env_secrets
+    jobs:
+      - template: ../templates/template-featurizer-ci.yml
+        parameters:
+          certificatePassword: $(certificatePassword)
+          containerRegistry: $(containerRegistry)
+          featurizerImageRepository: $(featurizerImageRepository)
+          poolName: $(poolName)
+          protosVersionLocation: $(protosVersionLocation)
+          protosVersionScriptLocation: $(protosVersionScriptLocation)
+          servicePrincipalId: $(servicePrincipalId)
+          servicePrincipalSecret: $(servicePrincipalSecret)
+          tenantId: $(tenantId)
+          workingDirectoryFeaturizer: $(workingDirectoryFeaturizer)
+          workingDirectoryScripts: $(workingDirectoryScripts)
+          imageType: $(imageType)

@@ -3,17 +3,16 @@
 trigger:
   branches:
     include:
-      - main
+      - main  
   paths:
     include:
-      - solutions/scissors/MythicalScissorsActionRules
-      - solutions/scissors/.pipelines/action-rules-ci.yml
-
+      - solutions/scissors/RTSPImageCapturePY
+      - solutions/scissors/.pipelines/rtsp-imgcapture-ci.yml
 variables:
-  imageRepository: "scissors/mythicalxactionrules"
+  imageRepository: "camera/mythicalrtspcapture"
   imageTag: '$(Build.BuildId)'
-  workingDir: '$(Build.SourcesDirectory)/solutions/scissors/MythicalScissorsActionRules'
-  unittest_reportprefix: 'mythicalxactionrules'
+  workingDir: '$(Build.SourcesDirectory)/solutions/scissors/RTSPImageCapturePY'
+  unittest_reportprefix: 'mythicalrtspcapture'
   pythonversion: '3.9'
   srcRepoName: "MythicalKAN"
   opsRepoName: "MythicalArcOps"
