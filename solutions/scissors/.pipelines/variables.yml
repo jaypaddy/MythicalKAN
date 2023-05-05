@@ -1,0 +1,10 @@
+variables:
+  imageRepository: "scissors"
+  imageTag: '$(Build.BuildId)'
+  workingDir: '$(Build.SourcesDirectory)/solutions/scissors'
+  unittest_reportprefix: 'mythicalrtspcapture'
+  pythonversion: '3.9'
+  srcRepoName: "MythicalKAN"
+  opsRepoName: "MythicalArcOps"
+  azure_connection_name: "Mythical-JAYPADDY-LAB"
+  keyvault_name: mythicalarcopskv

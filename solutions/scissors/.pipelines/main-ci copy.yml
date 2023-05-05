@@ -1,23 +1,22 @@
-                             
-parameters:
-- name: imageRepository
-  type: string
-- name: imageTag
-  type: string
-- name: workingDir
-  type: string
-- name: unittest_reportprefix
-  type: number
-- name: pythonversion
-  type: string
-- name: pythonversion
-  type: string
-- name: azure_connection_name
-  type: string
-- name: keyvault_name
-  type: string
+# build, test (to be built) and push to container registry
+
+trigger:
+- main
+
+variables:
+  imageRepository: "scissors"
+  imageTag: '$(Build.BuildId)'
+  workingDir: '$(Build.SourcesDirectory)/solutions/scissors'
+  unittest_reportprefix: 'mythicalrtspcapture'
+  pythonversion: '3.9'
+  srcRepoName: "MythicalKAN"
+  opsRepoName: "MythicalArcOps"
+
+pool:
+  vmImage: ubuntu-latest
 
 steps:
+  - checkout: self
 
   - task: AzureKeyVault@2
     inputs:
@@ -28,8 +27,8 @@ steps:
 
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '${{parameters.pythonversion}}'
-    displayName: 'Use Python ${{parameters.pythonversion}}'
+      versionSpec: '${{variables.pythonversion}}'
+    displayName: 'Use Python ${{variables.pythonversion}}'
 
   - script: |
       python -m pip install --upgrade pip
@@ -44,14 +43,14 @@ steps:
   - script: |
       pip install -r requirements.txt
     displayName: 'install requirements.txt'
-    workingDirectory: '${{ parameters.workingDir }}/MythicalScissorsActionRules'
+    workingDirectory: '${{ variables.workingDir }}/MythicalScissorsActionRules'
 
   - task: Docker@2
     displayName: 'Build & Push Action Rules docker image'
     name: dockerBuild
     inputs:
       containerRegistry: mythicalconACRServiceConnection
-      repository: '${{ parameters.imageRepository }}/xactionrules'
+      repository: '${{ variables.imageRepository }}/xactionrules'
       command: 'buildAndPush'
-      Dockerfile: '${{parameters.workingDir}}/MythicalScissorsActionRules/Dockerfile'
+      Dockerfile: '${{variables.workingDir}}/MythicalScissorsActionRules/Dockerfile'
 

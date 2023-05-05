@@ -4,53 +4,23 @@ trigger:
 - main
 
 variables:
-  imageRepository: "scissors"
-  imageTag: '$(Build.BuildId)'
-  workingDir: '$(Build.SourcesDirectory)/solutions/scissors'
-  unittest_reportprefix: 'mythicalrtspcapture'
-  pythonversion: '3.9'
-  srcRepoName: "MythicalKAN"
-  opsRepoName: "MythicalArcOps"
+- template: variables.yml
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-  - checkout: self
-
-  - task: AzureKeyVault@2
-    inputs:
-      azureSubscription: 'Mythical-JAYPADDY-LAB'
-      KeyVaultName: 'mythicalarcopskv'
-      SecretsFilter: '*'
-      RunAsPreJob: true
-
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '${{variables.pythonversion}}'
-    displayName: 'Use Python ${{variables.pythonversion}}'
-
-  - script: |
-      python -m pip install --upgrade pip
-    displayName: 'pip install upgrade'
-
-  - script: |
-      pip install pytest pytest-azurepipelines
-      pip install pytest-cov
-    displayName: 'install pytest'
-
- # Action Rules 
-  - script: |
-      pip install -r requirements.txt
-    displayName: 'install requirements.txt'
-    workingDirectory: '${{ variables.workingDir }}/MythicalScissorsActionRules'
-
-  - task: Docker@2
-    displayName: 'Build & Push Action Rules docker image'
-    name: dockerBuild
-    inputs:
-      containerRegistry: mythicalconACRServiceConnection
-      repository: '${{ variables.imageRepository }}/xactionrules'
-      command: 'buildAndPush'
-      Dockerfile: '${{variables.workingDir}}/MythicalScissorsActionRules/Dockerfile'
+stages:
+- stage: build_push_action_rules
+  jobs:
+  - job: execute_build_push_action_rules
+    steps:
+    - template: action-rules-ci.yml
+      parameters:
+          imageRepository: ${{ variables.imageRepository }}
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+          unittest_reportprefix: ${{ variables.unittest_reportprefix }}
+          pythonversion: ${{ variables.pythonversion }}
+          azure_connection_name: ${{ variables.azure_connection_name }}
+          keyvault_name: ${{ variables.keyvault_name }}
 
