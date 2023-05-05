@@ -44,6 +44,7 @@ steps:
       pip install pytest-cov
     displayName: 'install pytest'
 
+ # Action Rules 
   - script: |
       pip install -r requirements.txt
     displayName: 'install requirements.txt'
