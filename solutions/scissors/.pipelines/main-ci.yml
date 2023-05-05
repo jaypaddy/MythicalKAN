@@ -23,4 +23,18 @@ stages:
           pythonversion: ${{ variables.pythonversion }}
           azure_connection_name: ${{ variables.azure_connection_name }}
           keyvault_name: ${{ variables.keyvault_name }}
+- stage: build_push_object_detection
+  jobs:
+  - job: execute_build_push_object_detection
+    steps:
+    - template: obj-detection-ci.yml
+      parameters:
+          imageRepository: ${{ variables.imageRepository }}
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+          unittest_reportprefix: ${{ variables.unittest_reportprefix }}
+          pythonversion: ${{ variables.pythonversion }}
+          azure_connection_name: ${{ variables.azure_connection_name }}
+          keyvault_name: ${{ variables.keyvault_name }}  
+          acr_connect_name: $${{ variables.acr_connect_name}}        
 

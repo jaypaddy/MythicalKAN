@@ -52,4 +52,4 @@ steps:
       repository: '${{ parameters.imageRepository }}/xactionrules'
       command: 'buildAndPush'
       Dockerfile: '${{parameters.workingDir}}/MythicalScissorsActionRules/Dockerfile'
-
+      tags: ${{ parameters.imageTag }}

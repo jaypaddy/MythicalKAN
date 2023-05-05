@@ -74,6 +74,7 @@ steps:
       repository: ${{ variables.imageRepository }}
       command: 'buildAndPush'
       Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+      tag: 
 
   - task: Bash@3
     displayName: 'Display Container name with Tag'

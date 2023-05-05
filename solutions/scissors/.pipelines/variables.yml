@@ -7,4 +7,6 @@ variables:
   srcRepoName: "MythicalKAN"
   opsRepoName: "MythicalArcOps"
   azure_connection_name: "Mythical-JAYPADDY-LAB"
-  keyvault_name: mythicalarcopskv
+  keyvault_name: "mythicalarcopskv"
+  acr_connect_name: "mythicalconACRServiceConnection"
+
