@@ -4,9 +4,8 @@ trigger:
       - main  
   paths:
     include:
-      - solutions/scissors/.pipelines/action-rules-ci.yml
-      - solutions/scissors/.pipelines/obj-detection-ci.yml
-      - solutions/scissors/.pipelines/rtsp-imgcapture-ci.yml
+      - ./action-rules-ci.yml
+
 
 variables:
   imageACRRepository: "scissors"
