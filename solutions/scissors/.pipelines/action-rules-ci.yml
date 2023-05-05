@@ -1,25 +1,12 @@
-parameters:
-  - name: imageRepository
-    type: string
-  - name: imageTag
-    type: string    
-  - name: workingDir
-    type: string    
-  - name: unittest_reportprefix
-    type: string  
-  - name: pythonversion
-    type: string 
-  - name: srcRepoName
-    type: string 
-  - name: opsRepoName
-    type: string   
-  - name: keyVaultName
-    type: string     
-  - name: subscriptionName
-    type: string     
-  - name: acrServiceConnectionName
-    type: string                                   
-
+                             
+variables:
+  imageRepository: "scissors/mythicalxactionrules"
+  imageTag: '$(Build.BuildId)'
+  workingDir: '$(Build.SourcesDirectory)/solutions/scissors/MythicalScissorsActionRules'
+  unittest_reportprefix: 'mythicalxobjdetection'
+  pythonversion: '3.9'
+  srcRepoName: "MythicalKAN"
+  opsRepoName: "MythicalArcOps"
 
 jobs:
   - job: build_action_rules
@@ -35,25 +22,25 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            echo "${{ parameters.acrServiceConnectionName }}/${{ parameters.subscriptionName }} ${{ parameters.keyVaultName }}"
+            echo "${{ variables.acrServiceConnectionName }}/${{ variables.subscriptionName }} ${{ variables.keyVaultName }}"
 
 
 
 
       - task: AzureKeyVault@2
         inputs:
-          azureSubscription: ${{ parameters.subscriptionName }}
-          KeyVaultName: ${{ parameters.keyVaultName }}
+          azureSubscription: ${{ variables.subscriptionName }}
+          KeyVaultName: ${{ variables.keyVaultName }}
           SecretsFilter: '*'
           RunAsPreJob: true
 
-      - script: echo "Building App :${{ parameters.imageRepository }}"
+      - script: echo "Building App :${{ variables.imageRepository }}"
         displayName: 'Run CICD'
 
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: '${{parameters.pythonversion}}'
-        displayName: 'Use Python ${{parameters.pythonversion}}'
+          versionSpec: '${{variables.pythonversion}}'
+        displayName: 'Use Python ${{variables.pythonversion}}'
 
       - script: |
           python -m pip install --upgrade pip
@@ -67,17 +54,17 @@ jobs:
       - script: |
           pip install -r requirements.txt
         displayName: 'install requirements.txt'
-        workingDirectory: ${{ parameters.workingDir }}
+        workingDirectory: ${{ variables.workingDir }}
 
     
       - script: |
           python -m pytest \
-          --junitxml=$(Common.TestResultsDirectory)/${{ parameters.unittest_reportprefix }}_unittest-results.xml \
+          --junitxml=$(Common.TestResultsDirectory)/${{ variables.unittest_reportprefix }}_unittest-results.xml \
           --cov=. \
           --verbose \
-          --cov-report=xml:$(Common.TestResultsDirectory)/${{ parameters.unittest_reportprefix }}_coverage.xml .
+          --cov-report=xml:$(Common.TestResultsDirectory)/${{ variables.unittest_reportprefix }}_coverage.xml .
         displayName: 'Run unit tests'
-        workingDirectory: ${{ parameters.workingDir }}
+        workingDirectory: ${{ variables.workingDir }}
 
       - task: PublishTestResults@2
         displayName: 'Publish unit test results'
@@ -91,8 +78,8 @@ jobs:
         displayName: 'Build docker images'
         name: dockerBuild
         inputs:
-          containerRegistry: $${{ parameters.acrServiceConnectionName }}
-          repository: ${{ parameters.imageRepository }}
+          containerRegistry: $${{ variables.acrServiceConnectionName }}
+          repository: ${{ variables.imageRepository }}
           command: 'buildAndPush'
           Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
 
@@ -101,5 +88,5 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            echo "Container built: $${{ parameters.acrServiceConnectionName }}/${{ parameters.imageRepository }}:${{ parameters.imageTag }}"
+            echo "Container built: $${{ variables.acrServiceConnectionName }}/${{ variables.imageRepository }}:${{ variables.imageTag }}"
 
