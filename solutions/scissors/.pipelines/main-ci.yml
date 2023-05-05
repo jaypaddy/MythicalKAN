@@ -42,7 +42,7 @@ steps:
   - script: |
       pip install -r requirements.txt
     displayName: 'install requirements.txt'
-    workingDirectory: ${{ variables.workingDir }}
+    workingDirectory: '${{ variables.workingDir }}/MythicalScissorsActionRules'
 
  # Action Rules 
   - script: |
