@@ -30,6 +30,16 @@ jobs:
     steps:
       - checkout: self
 
+      - task: Bash@3
+        displayName: 'Display Parameter'
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "${{ parameters.acrServiceConnectionName }}/${{ parameters.subscriptionName }} ${{ parameters.keyVaultName }}"
+
+
+
+
       - task: AzureKeyVault@2
         inputs:
           azureSubscription: ${{ parameters.subscriptionName }}
