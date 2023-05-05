@@ -1,13 +1,8 @@
 # build, test (to be built) and push to container registry
 
-trigger:
-  branches:
-    include:
-      - main  
-  paths:
-    include:
-      - solutions/scissors/MythicalScissorsObjDetection
-      - solutions/scissors/.pipelines/obj-detection-ci.yml
+trigger: none
+pr: none
+
 
 variables:
   imageRepository: "scissors/mythicalxobjdetection"

@@ -10,25 +10,34 @@ trigger:
       - solutions/scissors/.pipelines/action-rules-ci.yml
       - solutions/scissors/.pipelines/obj-detection-ci.yml
       - solutions/scissors/.pipelines/rtsp-imgcapture-ci.yml
+
+variables:
+  imageACRRepository: "scissors"
+  imageTag: '$(Build.BuildId)'
+  workingDir: '$(Build.SourcesDirectory)/solutions/scissors'
+  unittest_reportprefix: 'mythicalx'
+  pythonversion: '3.9'
+  srcRepoName: "MythicalKAN"
+  opsRepoName: "MythicalArcOps"
+  keyVaultName: "mythicalarcopskv"
+  subscriptionName: "Mythical-JAYPADDY-LAB"
+  acrServiceConnectionName: "mythicalconACRServiceConnection"
+
 stages:
-  - stage: dev
-    displayName: 'Dev Environment CI'
-    condition: or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.Reason'], 'Manual'))
-    variables:
-      - template: ../variables/dev.yml
-      - group: dev_env_secrets
+  - stage: actionrules
+    displayName: 'Build MythicalScissors Action Rules'
     jobs:
-      - template: ../templates/template-featurizer-ci.yml
+      - template: ./action-rules-ci.yml
         parameters:
-          certificatePassword: $(certificatePassword)
-          containerRegistry: $(containerRegistry)
-          featurizerImageRepository: $(featurizerImageRepository)
-          poolName: $(poolName)
-          protosVersionLocation: $(protosVersionLocation)
-          protosVersionScriptLocation: $(protosVersionScriptLocation)
-          servicePrincipalId: $(servicePrincipalId)
-          servicePrincipalSecret: $(servicePrincipalSecret)
-          tenantId: $(tenantId)
-          workingDirectoryFeaturizer: $(workingDirectoryFeaturizer)
-          workingDirectoryScripts: $(workingDirectoryScripts)
-          imageType: $(imageType)
+          imageRepository: '$[variables.imageACRRepository]/actionrules'
+          imageTag: $[variables.imageTag]
+          workingDir: '$[variables.workingDir]/MythicalScissorsActionRules'
+          unittest_reportprefix: '$[variables.unittest_reportprefix]-mythicalxactionrules'
+          pythonversion: $[variables.pythonversion]
+          srcRepoName: $[variables.srcRepoName]
+          opsRepoName: $[variables.opsRepoName] 
+          keyVaultName: $[variables.keyVaultName] 
+          subscriptionName: $[variables.subscriptionName]
+          acrServiceConnectionName: $[variables.acrServiceConnectionName]
+
+

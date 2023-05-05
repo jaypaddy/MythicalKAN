@@ -1,0 +1,18 @@
+# Default values for mythicalscissors.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+enabled: true
+replicaCount: 1
+global:
+  image:
+    registry: "mythicalcon.azurecr.io/arc"
+    pullPolicy: "Always"
+
+dependencies:
+  - name: rtspimgcapture
+
+rtspimgcapture:
+  enabled: true
+  image:
+    tag: "ABC-v1"

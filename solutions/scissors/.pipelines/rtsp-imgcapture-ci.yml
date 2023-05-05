@@ -1,13 +1,9 @@
 # build, test (to be built) and push to container registry
 
-trigger:
-  branches:
-    include:
-      - main  
-  paths:
-    include:
-      - solutions/scissors/RTSPImageCapturePY
-      - solutions/scissors/.pipelines/rtsp-imgcapture-ci.yml
+
+trigger: none
+pr: none
+
 variables:
   imageRepository: "camera/mythicalrtspcapture"
   imageTag: '$(Build.BuildId)'
