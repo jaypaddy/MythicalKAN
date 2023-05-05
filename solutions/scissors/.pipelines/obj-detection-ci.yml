@@ -17,16 +17,12 @@ parameters:
 - name: acr_connect_name
   type: string  
 
-variables:
-  project_name: "MythicalScissorsObjDetection"
-  image_name: "objdetection"
-
 steps:
 
   - task: AzureKeyVault@2
     inputs:
-      azureSubscription: 'Mythical-JAYPADDY-LAB'
-      KeyVaultName: 'mythicalarcopskv'
+      azureSubscription: ${{ parameters.azure_connection_name }}
+      KeyVaultName: ${{ parameters.keyvault_name }}
       SecretsFilter: '*'
       RunAsPreJob: true
 
@@ -48,15 +44,14 @@ steps:
   - script: |
       pip install -r requirements.txt
     displayName: 'install requirements.txt'
-    workingDirectory: '${{ parameters.workingDir }}/${{ variables.project_name }}'
+    workingDirectory: '${{ parameters.workingDir }}/${{ variables.objdet_rules_project_name }}'
 
   - task: Docker@2
     displayName: 'Build & Push Action Rules docker image'
     name: dockerBuild
     inputs:
-      containerRegistry: $${{ parameters.acr_connect_name }}
-      repository: '${{ parameters.imageRepository }}/${{ variables.image_name }}'
+      containerRegistry: ${{ parameters.acr_connect_name }}
+      repository: '${{ parameters.imageRepository }}/${{ variables.objdet_rules_image_name }}'
       command: 'buildAndPush'
-      Dockerfile: '${{parameters.workingDir}}/${{ variables.project_name }}/Dockerfile'
+      Dockerfile: '${{parameters.workingDir}}/${{ variables.objdet_rules_project_name }}/Dockerfile'
       tags: ${{ parameters.imageTag }}
-

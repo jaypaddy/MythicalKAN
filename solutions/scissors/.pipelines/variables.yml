@@ -1,4 +1,5 @@
 variables:
+  # Common
   imageRepository: "scissors"
   imageTag: '$(Build.BuildId)'
   workingDir: '$(Build.SourcesDirectory)/solutions/scissors'
@@ -10,3 +11,14 @@ variables:
   keyvault_name: "mythicalarcopskv"
   acr_connect_name: "mythicalconACRServiceConnection"
 
+  #ActionRules
+  action_rules_project_name: "MythicalScissorsActionRules"
+  action_rules_image_name: "actionrules"
+
+  #ObjDetection
+  objdet_rules_project_name: "MythicalScissorsObjDetection"
+  objdet_rules_image_name: "objdetection"
+
+  #ImageCapture
+  imgcapture_rules_project_name: "RTSPImageCapturePY"
+  imgcapture_rules_image_name: "rtspimgcapture"  
