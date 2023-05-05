@@ -1,8 +1,3 @@
-# build, test (to be built) and push to container registry
-
-trigger: none
-pr: none
-
 parameters:
   - name: imageRepository
     type: string
