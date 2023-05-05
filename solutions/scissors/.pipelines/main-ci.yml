@@ -2,14 +2,7 @@ trigger:
   branches:
     include:
       - main  
-  paths:
-    include:
-      - solutions/scissors/MythicalScissorsActionRules
-      - solutions/scissors/MythicalScissorsObjDetection
-      - solutions/scissors/RTSPImageCapturePY
-      - solutions/scissors/.pipelines/action-rules-ci.yml
-      - solutions/scissors/.pipelines/obj-detection-ci.yml
-      - solutions/scissors/.pipelines/rtsp-imgcapture-ci.yml
+
 
 variables:
   imageACRRepository: "scissors"
