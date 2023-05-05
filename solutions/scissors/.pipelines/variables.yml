@@ -9,7 +9,7 @@ variables:
   opsRepoName: "MythicalArcOps"
   azure_connection_name: "Mythical-JAYPADDY-LAB"
   keyvault_name: "mythicalarcopskv"
-  acr_connect_name: mythicalconACRServiceConnection
+  acr_connect_name: "mythicalconACRServiceConnection"
 
   #ActionRules
   action_rules_project_name: "MythicalScissorsActionRules"

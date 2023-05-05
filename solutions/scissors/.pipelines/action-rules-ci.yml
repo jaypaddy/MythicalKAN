@@ -50,7 +50,7 @@ steps:
     displayName: 'Build & Push Action Rules docker image'
     name: dockerBuild
     inputs:
-      containerRegistry: ${{ parameters.acr_connect_name }}
+      containerRegistry: mythicalconACRServiceConnection
       repository: '${{ parameters.imageRepository }}/${{ variables.action_rules_image_name }}'
       command: 'buildAndPush'
       Dockerfile: '${{parameters.workingDir}}/${{ variables.action_rules_project_name }}/Dockerfile'
