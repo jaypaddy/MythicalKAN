@@ -12,13 +12,13 @@ variables:
   acr_connect_name: "mythicalconACRServiceConnection"
 
   #ActionRules
-  action_rules_project_name: "MythicalScissorsActionRules"
-  action_rules_image_name: "actionrules"
+  actionrules_project_name: "MythicalScissorsActionRules"
+  actionrules_image_name: "actionrules"
 
   #ObjDetection
-  objdet_rules_project_name: "MythicalScissorsObjDetection"
-  objdet_rules_image_name: "objdetection"
+  objdet_project_name: "MythicalScissorsObjDetection"
+  objdet_image_name: "objdetection"
 
   #ImageCapture
-  imgcapture_rules_project_name: "RTSPImageCapturePY"
-  imgcapture_rules_image_name: "rtspimgcapture"  
+  imgcapture_project_name: "RTSPImageCapturePY"
+  imgcapture_image_name: "rtspimgcapture"  
