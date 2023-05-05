@@ -7,8 +7,6 @@ parameters:
 - name: workingDir
   type: string
 - name: unittest_reportprefix
-  type: number
-- name: pythonversion
   type: string
 - name: pythonversion
   type: string
