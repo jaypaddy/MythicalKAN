@@ -16,6 +16,10 @@ parameters:
   type: string
 - name: acr_connect_name
   type: string  
+- name: project_name
+  type: string  
+- name: image_name
+  type: string      
 
 steps:
 
@@ -44,14 +48,14 @@ steps:
   - script: |
       pip install -r requirements.txt
     displayName: 'install requirements.txt'
-    workingDirectory: '${{ parameters.workingDir }}/${{ variables.action_rules_project_name }}'
+    workingDirectory: '${{ parameters.workingDir }}/${{ parameters.project_name }}'
 
   - task: Docker@2
     displayName: 'Build & Push Action Rules docker image'
     name: dockerBuild
     inputs:
       containerRegistry: mythicalconACRServiceConnection
-      repository: '${{ parameters.imageRepository }}/${{ variables.action_rules_image_name }}'
+      repository: '${{ parameters.imageRepository }}/${{ parameters.image_name }}'
       command: 'buildAndPush'
-      Dockerfile: '${{parameters.workingDir}}/${{ variables.action_rules_project_name }}/Dockerfile'
+      Dockerfile: '${{parameters.workingDir}}/${{ parameters.project_name }}/Dockerfile'
       tags: ${{ parameters.imageTag }}

@@ -23,7 +23,9 @@ stages:
           pythonversion: ${{ variables.pythonversion }}
           azure_connection_name: ${{ variables.azure_connection_name }}
           keyvault_name: ${{ variables.keyvault_name }}
-          acr_connect_name: $${{ variables.acr_connect_name}}        
+          acr_connect_name: ${{ variables.acr_connect_name}}  
+          project_name: ${{ variables.action_rules_project_name }}      
+          image_name: ${{ variables.action_rules_image_name }}      
 
 - stage: build_push_object_detection
   jobs:
@@ -39,4 +41,22 @@ stages:
           azure_connection_name: ${{ variables.azure_connection_name }}
           keyvault_name: ${{ variables.keyvault_name }}  
           acr_connect_name: $${{ variables.acr_connect_name}}        
+          project_name: ${{ variables.obj_det_project_name }}      
+          image_name: ${{ variables.obj_det_image_name }}      
 
+- stage: build_push_rtsp_imgcapture
+  jobs:
+  - job: execute_build_push_rtsp_imgcapture
+    steps:
+    - template: rtsp-imgcapture-ci.yml
+      parameters:
+          imageRepository: ${{ variables.imageRepository }}
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+          unittest_reportprefix: ${{ variables.unittest_reportprefix }}
+          pythonversion: ${{ variables.pythonversion }}
+          azure_connection_name: ${{ variables.azure_connection_name }}
+          keyvault_name: ${{ variables.keyvault_name }}  
+          acr_connect_name: $${{ variables.acr_connect_name}}        
+          project_name: ${{ variables.imgcapture_rules_project_name }}      
+          image_name: ${{ variables.imgcapture_rules_image_name }}  
