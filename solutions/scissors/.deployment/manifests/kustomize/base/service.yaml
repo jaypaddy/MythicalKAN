@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: actionrules-svc
+spec:
+  ports:
+  - port: 443
+    targetPort: 9376
+  selector:
+    app: mythicalscissors
+    pod: actionrules
+    line: jp1913  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: actionrules-metrics-svc
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    app: mythicalscissors
+    pod: actionrules
+    line: jp1913
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rtspimgcapture-metrics-svc
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    app: mythicalscissors
+    pod: rtspimgcapture
+    line: jp1913
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rtspimgcapture-svc
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    app: mythicalscissors
+    pod: rtspimgcapture
+    line: jp1913
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: objectdetection-svc
+spec:
+  ports:
+  - port: 443
+    targetPort: 9376
+  selector:
+    app: mythicalscissors
+    pod: objdetection
+    line: jp1913  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: objectdetection-metrics-svc
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    app: mythicalscissors
+    pod: objdetection
+    line: jp1913

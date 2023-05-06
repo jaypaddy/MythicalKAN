@@ -1,0 +1,150 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mythicalscissors-ns
+  labels:
+    name: mythicalscissors
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: objdetection
+  labels:
+    app: mythicalscissors
+  namespace: mythicalscissors-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+    app: mythicalscissors
+    pod: objdetection
+    line: jp1913       
+  template:
+    metadata:
+      labels:
+        ver: latest 
+    spec:
+      containers:
+      - name: objectdetection
+        image: objdetection     
+        imagePullPolicy: Always
+        imagePullSecrets:
+        - name: regcred        
+        ports:
+          - containerPort: 9376
+            name: api
+          - containerPort: 8081
+            name: metrics
+        env:
+          - name: RTSP_URL
+            value: rtsp://admin:GrandCam1913!@10.0.0.38:554
+          - name: CLOUD_BLOB_CONN_STRING
+            valueFrom:
+              secretKeyRef:
+                name: cloud-blob-conn-string
+                key: CLOUD_BLOB_CONN_STRING            
+          - name: CLOUD_BLOB_CONN_STRING
+          - name: EDGE_INFERENCE_URL
+            value: "http://mythicalscissorsobjdetectionsvc:8080/image"
+          - name: EDGE_BLOB_CONTAINER_NAME
+            value: "objectdetection"
+          - name: LOGGING_LEVEL
+            value: INFO
+          - name: APP_NAME
+            value: mythicalscissors
+          - name: SCOPE_KEYS
+            value: "plant,edge,line,workload"
+          - name: SCOPE_VALUES
+            value: "FLOWERMOUND,MYTHICALAKSEE,FM407,MYTHICALSCISSORS"
+          - name: PROMETHEUS_PORT
+            value: 8081
+          - name: SLEEP_TIME
+            value : 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: actionrules
+  labels:
+    app: mythicalscissors
+  namespace: mythicalscissors-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+    app: mythicalscissors
+    pod: actionrules
+    line: jp1913       
+  template:
+    metadata:
+      labels:
+        ver: latest 
+    spec:
+      containers:
+      - name: actionrules
+        image: actionrules     
+        imagePullPolicy: Always
+        imagePullSecrets:
+        - name: regcred        
+        ports:
+          - containerPort: 9376
+            name: api
+          - containerPort: 8081
+            name: metrics
+        env:
+          - name: LOGGING_LEVEL
+            value: INFO
+          - name: APP_NAME
+            value: mythicalscissors
+          - name: SCOPE_KEYS
+            value: "plant,edge,line,workload"
+          - name: SCOPE_VALUES
+            value: "FLOWERMOUND,MYTHICALAKSEE,FM407,MYTHICALSCISSORS"
+          - name: PROMETHEUS_PORT
+            value: 8081
+          - name: SLEEP_TIME
+            value : 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rtspimagecapture
+  labels:
+    app: mythicalscissors
+  namespace: mythicalscissors-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+    app: mythicalscissors
+    pod: rtspimgcapture
+    line: jp1913       
+  template:
+    metadata:
+      labels:
+        ver: latest 
+    spec:
+      containers:
+      - name: rtspimagecapture
+        image: rtspimagecapture     
+        imagePullPolicy: Always
+        imagePullSecrets:
+        - name: regcred        
+        ports:
+          - containerPort: 9376
+            name: api
+          - containerPort: 8081
+            name: metrics
+        env:
+          - name: LOGGING_LEVEL
+            value: INFO
+          - name: APP_NAME
+            value: mythicalscissors
+          - name: SCOPE_KEYS
+            value: "plant,edge,line,workload"
+          - name: SCOPE_VALUES
+            value: "FLOWERMOUND,MYTHICALAKSEE,FM407,MYTHICALSCISSORS"
+          - name: PROMETHEUS_PORT
+            value: 8081
+          - name: SLEEP_TIME
+            value : 1

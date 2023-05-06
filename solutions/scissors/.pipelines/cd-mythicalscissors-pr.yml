@@ -1,0 +1,94 @@
+parameters:
+- name: imageTag
+  type: string
+- name: workingDir
+  type: string
+- name: azure_connection_name
+  type: string
+- name: keyvault_name
+  type: string
+- name: acr_connect_name
+  type: string  
+- name: project_name
+  type: string  
+- name: src_repo_name
+  type: string
+- name: ops_repo_name
+  type: string
+- name: manifests_bundle
+  type: string
+
+steps:
+  - task: AzureKeyVault@2
+    inputs:
+      azureSubscription: ${{ parameters.azure_connection_name }}
+      KeyVaultName: ${{ parameters.keyvault_name }}
+      SecretsFilter: '*'
+      RunAsPreJob: true
+  # Commit this file to a Branch on ArcGitOps Repo
+  - task: Bash@3
+    displayName: 'Post a PR on GitOps repo'
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+
+          pr_user_name="Jay Padmanabhan"
+          pr_user_email="jay_padmanabhan@hotmail.com"
+
+
+          git config --global user.email $pr_user_email
+          git config --global user.name $pr_user_name
+          set -eo pipefail  # fail on error
+
+          repo_name="MythicalArcOps"
+          echo "repo_name=$repo_name"
+          #repo_url="https://github.com/jaypaddy/MythicalArcOps.git"
+          repo_url=$(GITOPSURL)
+          echo "repo_url=$repo_url"
+          GITTOKEN=$(GITTOKEN)
+          GITCLASSICTOKEN=$(GITCLASSICTOKEN)
+          DEST_BRANCH="${{ parameters.src_repo_name }}/BUILD/${{ parameters.imageTag }}"
+          echo "DEST_BRANCH=$DEST_BRANCH"
+          DEST_FOLDER=$(GITOPSDESTFOLDER)
+          echo "DEST_FOLDER=$DEST_FOLDER"
+          cloneable_repo_url=$(CLONEABLEGITOPSREPOURL)
+          echo "cloneable_repo_url=$cloneable_repo_url"
+          git clone $cloneable_repo_url 
+          echo "git clone $cloneable_repo_url"
+          ls -l
+          echo "cd $repo_name"
+          cd "$repo_name"
+          pwd
+          git branch $DEST_BRANCH
+          git checkout $DEST_BRANCH        
+          echo "git status"
+          git status
+
+          # Copy baked manifest bundle into readytodeploy directory
+          cp ${{ parameters.manifestsbundle }} ./readytodeploy
+          git add -A
+          echo "git status"
+          git status
+          echo `git status --porcelain | head -1`
+          if [[ `git status --porcelain | head -1` ]]; then
+              git commit -m "deployment $DEST_BRANCH"
+              echo "Push to the deploy branch $deploy_branch_name"
+              echo "git push --set-upstream $cloneable_repo_url $deploy_branch_name"
+              git push --set-upstream $cloneable_repo_url $DEST_BRANCH
+
+              # Create a PR 
+              echo "Create a PR to $DEST_BRANCH"
+              
+              export GITHUB_TOKEN=$GITCLASSICTOKEN
+              pr_response=$(gh pr create --repo $cloneable_repo_url --base main --head $DEST_BRANCH --title "deployment $DEPLOY_ID" --body "Deploy to $DEST_BRANCH")
+              echo $pr_response
+              if [[ "$AUTO_MERGE" == "Y" ]]; then
+                  pr_num="${pr_response##*pull/}"
+                  echo $pr_num
+                  gh pr merge $pr_num -m -d --repo $repo_url
+              fi
+          fi          
+
+
+          

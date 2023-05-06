@@ -60,3 +60,28 @@ stages:
           acr_connect_name: $${{ variables.acr_connect_name}}        
           project_name: ${{ variables.imgcapture_project_name }}      
           image_name: ${{ variables.imgcapture_image_name }}  
+
+- stage: bake_kustomize_manifest
+  jobs:
+  - job: execute_bake_kustomize_manifest
+    steps:
+    - template: bake-manifest-ci.yml
+      parameters:
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+
+- stage: make_pr_to_gitopsrepo
+  jobs:
+  - job: execute_make_pr_to_gitopsrepo
+    dependsOn: bake_kustomize_manifest
+    steps:
+    - template: cd-mythicalscissors-pr.yml
+      parameters:
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+          azure_connection_name: ${{ variables.azure_connection_name }}
+          keyvault_name: ${{ variables.keyvault_name }}  
+          acr_connect_name: $${{ variables.acr_connect_name}}        
+          src_repo_name: ${{ variables.src_repo_name }}      
+          ops_repo_name: ${{ variables.ops_repo_name }} 
+          manifest_bundle: $[ dependencies.AzureVariables.outputs['azureVariables.MANIFESTS_BUNDLE'] ]
