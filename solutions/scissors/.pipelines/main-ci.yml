@@ -9,8 +9,6 @@ variables:
 pool:
   vmImage: ubuntu-latest
 
-
-
 stages:
 - stage: display_variable
   jobs:
@@ -28,7 +26,7 @@ stages:
   jobs:
   - job: execute_build_push_action_rules
     steps:  
-    - template: ./templates/action-rules-ci.yml
+    - template: ${{ variables.workingDir }}/.pipelines/templates/action-rules-ci.yml
       parameters:
           imageRepository: ${{ variables.imageRepository }}
           imageTag: ${{ variables.imageTag }}
@@ -45,7 +43,7 @@ stages:
   jobs:
   - job: execute_build_push_object_detection
     steps:
-    - template: ./templates/obj-detection-ci.yml
+    - template: ${{ variables.workingDir }}/.pipelines/templates/obj-detection-ci.yml
       parameters:
           imageRepository: ${{ variables.imageRepository }}
           imageTag: ${{ variables.imageTag }}
@@ -62,7 +60,7 @@ stages:
   jobs:
   - job: execute_build_push_rtsp_imgcapture
     steps:
-    - template: ./templates/rtsp-imgcapture-ci.yml
+    - template: ${{ variables.workingDir }}/.pipelines/templates/rtsp-imgcapture-ci.yml
       parameters:
           imageRepository: ${{ variables.imageRepository }}
           imageTag: ${{ variables.imageTag }}
@@ -75,18 +73,18 @@ stages:
           project_name: ${{ variables.imgcapture_project_name }}      
           image_name: ${{ variables.imgcapture_image_name }}  
 
-- stage: bake_kustomize_manifest
+- stage: bake_kustomize_pr_manifest
   jobs:
-  - job: execute_bake_kustomize_manifest
+  - job: execute_bake_kustomize_pr_manifest
     steps:
-    - template: ./templates/bake-manifest-ci.yml
+    - template: ${{ variables.workingDir }}/.pipelines/templates/bake-manifest-ci.yml
       parameters:
           imageTag: ${{ variables.imageTag }}
           workingDir: ${{ variables.workingDir }}
   - job: execute_make_pr_to_gitopsrepo
     dependsOn: execute_bake_kustomize_manifest
     steps:
-    - template: ./templates/cd-mythicalscissors-pr.yml
+    - template: ${{ variables.workingDir }}/.pipelines/templates/cd-mythicalscissors-pr.yml
       parameters:
           imageTag: ${{ variables.imageTag }}
           workingDir: ${{ variables.workingDir }}

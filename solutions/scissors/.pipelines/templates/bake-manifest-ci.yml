@@ -16,9 +16,9 @@ steps:
       script: |
           #!/bin/bash
           sed "s/IMAGE_TAG/BUILD-${{ parameters.imageTag }}/g" \
-              $(workingDir).deployment/kustomize/dev/kustomization.template.yaml \
-                > $(workingDir).deployment/kustomize/dev/kustomization.yaml
-          cat $(workingDir).deployment/kustomize/dev/kustomization.yaml
+              $(workingDir)/.deployment/manifests/kustomize/dev/kustomization.template.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/dev/kustomization.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/dev/kustomization.yaml
 
   - task: KubernetesManifest@0
     name: bake
@@ -26,7 +26,7 @@ steps:
     inputs:
       action: bake
       renderType: kustomize
-      kustomizationPath:  $(workingDir)/deployment/kustomize/dev
+      kustomizationPath:  $(workingDir)/deployment/manifests/kustomize/dev
 
   - task: Bash@3
     name: display_bake
