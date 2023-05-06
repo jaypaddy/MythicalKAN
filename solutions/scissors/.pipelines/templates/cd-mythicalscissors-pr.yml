@@ -41,7 +41,6 @@ steps:
 
           repo_name="MythicalArcOps"
           echo "repo_name=$repo_name"
-          #repo_url="https://github.com/jaypaddy/MythicalArcOps.git"
           repo_url=$(GITOPSURL)
           echo "repo_url=$repo_url"
           GITTOKEN=$(GITTOKEN)
@@ -64,8 +63,8 @@ steps:
           git status
 
           # Copy baked manifest bundle into readytodeploy directory
-          echo "Manifests Bundle:" ${{ parameters.manifests_bundle }}
-          cp ${{ parameters.manifests_bundle }} ./readytodeploy
+          echo "Manifests Bundle:" $MANIFESTS_BUNDLE
+          cp $MANIFESTS_BUNDLE ./readytodeploy
           git add -A
           echo "git status"
           git status
