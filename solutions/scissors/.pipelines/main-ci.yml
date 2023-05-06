@@ -84,4 +84,4 @@ stages:
           acr_connect_name: $${{ variables.acr_connect_name}}        
           src_repo_name: ${{ variables.src_repo_name }}      
           ops_repo_name: ${{ variables.ops_repo_name }} 
-          manifest_bundle: $[ dependencies.AzureVariables.outputs['azureVariables.MANIFESTS_BUNDLE'] ]
+          manifests_bundle: $[ dependencies.AzureVariables.outputs['azureVariables.MANIFESTS_BUNDLE'] ]
