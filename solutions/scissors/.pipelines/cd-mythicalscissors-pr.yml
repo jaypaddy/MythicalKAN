@@ -64,7 +64,7 @@ steps:
           git status
 
           # Copy baked manifest bundle into readytodeploy directory
-          cp ${{ parameters.manifestsbundle }} ./readytodeploy
+          cp ${{ parameters.manifests_bundle }} ./readytodeploy
           git add -A
           echo "git status"
           git status
