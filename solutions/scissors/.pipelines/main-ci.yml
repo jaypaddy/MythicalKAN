@@ -26,7 +26,7 @@ stages:
   jobs:
   - job: execute_build_push_action_rules
     steps:  
-    - template: ${{ variables.workingDir }}/.pipelines/templates/action-rules-ci.yml
+    - template: ./templates/action-rules-ci.yml
       parameters:
           imageRepository: ${{ variables.imageRepository }}
           imageTag: ${{ variables.imageTag }}
@@ -43,7 +43,7 @@ stages:
   jobs:
   - job: execute_build_push_object_detection
     steps:
-    - template: ${{ variables.workingDir }}/.pipelines/templates/obj-detection-ci.yml
+    - template: ./templates/obj-detection-ci.yml
       parameters:
           imageRepository: ${{ variables.imageRepository }}
           imageTag: ${{ variables.imageTag }}
@@ -60,7 +60,7 @@ stages:
   jobs:
   - job: execute_build_push_rtsp_imgcapture
     steps:
-    - template: ${{ variables.workingDir }}/.pipelines/templates/rtsp-imgcapture-ci.yml
+    - template: ./templates/rtsp-imgcapture-ci.yml
       parameters:
           imageRepository: ${{ variables.imageRepository }}
           imageTag: ${{ variables.imageTag }}
@@ -77,14 +77,14 @@ stages:
   jobs:
   - job: execute_bake_kustomize_pr_manifest
     steps:
-    - template: ${{ variables.workingDir }}/.pipelines/templates/bake-manifest-ci.yml
+    - template: ./templates/bake-manifest-ci.yml
       parameters:
           imageTag: ${{ variables.imageTag }}
           workingDir: ${{ variables.workingDir }}
   - job: execute_make_pr_to_gitopsrepo
     dependsOn: execute_bake_kustomize_manifest
     steps:
-    - template: ${{ variables.workingDir }}/.pipelines/templates/cd-mythicalscissors-pr.yml
+    - template: ./templates/cd-mythicalscissors-pr.yml
       parameters:
           imageTag: ${{ variables.imageTag }}
           workingDir: ${{ variables.workingDir }}
