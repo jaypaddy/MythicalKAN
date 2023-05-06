@@ -71,7 +71,7 @@ stages:
           workingDir: ${{ variables.workingDir }}
 
   - job: execute_make_pr_to_gitopsrepo
-    dependsOn: bake_kustomize_manifest
+    dependsOn: execute_bake_kustomize_manifest
     steps:
     - template: cd-mythicalscissors-pr.yml
       parameters:
