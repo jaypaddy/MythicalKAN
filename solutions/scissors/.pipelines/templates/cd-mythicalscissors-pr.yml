@@ -13,8 +13,6 @@ parameters:
   type: string
 - name: ops_repo_name
   type: string
-- name: manifests_bundle
-  type: string
 
 steps:
   - task: AzureKeyVault@2
