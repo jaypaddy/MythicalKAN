@@ -9,11 +9,25 @@ variables:
 pool:
   vmImage: ubuntu-latest
 
+
+
 stages:
+- stage: display_variable
+  jobs:
+  - job: execute_display_variable
+    steps:
+      - task: Bash@3
+        name: display_var
+        displayName: Display variable
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "workingDir: ${{ variables.workingDir }}"
+
 - stage: build_push_action_rules
   jobs:
   - job: execute_build_push_action_rules
-    steps:
+    steps:  
     - template: ${{ variables.workingDir }}/.pipelines/templates/action-rules-ci.yml
       parameters:
           imageRepository: ${{ variables.imageRepository }}
