@@ -30,7 +30,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
   properties: {
     containers: [
       {
-        name: objdetection
+        name: 'objdetection'
         properties: {
           image: image
           ports: [
@@ -48,7 +48,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
         }
       }
       {
-        name: dateTimeAdd()
+        name: 'actionrules'
         properties: {
           image: image
           ports: [
