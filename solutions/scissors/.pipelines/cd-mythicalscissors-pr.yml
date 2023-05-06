@@ -9,8 +9,6 @@ parameters:
   type: string
 - name: acr_connect_name
   type: string  
-- name: project_name
-  type: string  
 - name: src_repo_name
   type: string
 - name: ops_repo_name
