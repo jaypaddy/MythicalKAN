@@ -22,7 +22,7 @@ stages:
   - job: execute_make_pr_to_gitopsrepo
     dependsOn: execute_bake_kustomize_pr_manifest
     variables:
-      manifests_bundle: $[ dependencies.execute_bake_kustomize_pr_manifest.outputs['azureVariables.MANIFESTS_BUNDLE'] ]
+      MANIFESTS_BUNDLE: $[ dependencies.execute_bake_kustomize_pr_manifest.outputs['azureVariables.MANIFESTS_BUNDLE'] ]
     steps:
     - template: ./templates/cd-mythicalscissors-pr.yml
       parameters:
