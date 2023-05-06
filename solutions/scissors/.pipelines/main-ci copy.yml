@@ -1,0 +1,96 @@
+# build, test (to be built) and push to container registry
+
+trigger:
+- main
+
+variables:
+- template: variables.yml
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: display_variable
+  jobs:
+  - job: execute_display_variable
+    steps:
+      - task: Bash@3
+        name: display_var
+        displayName: Display variable
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "workingDir: ${{ variables.workingDir }}"
+
+- stage: build_push_action_rules
+  jobs:
+  - job: execute_build_push_action_rules
+    steps:  
+    - template: ./templates/action-rules-ci.yml
+      parameters:
+          imageRepository: ${{ variables.imageRepository }}
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+          unittest_reportprefix: ${{ variables.unittest_reportprefix }}
+          pythonversion: ${{ variables.pythonversion }}
+          azure_connection_name: ${{ variables.azure_connection_name }}
+          keyvault_name: ${{ variables.keyvault_name }}
+          acr_connect_name: ${{ variables.acr_connect_name}}  
+          project_name: ${{ variables.actionrules_project_name }}      
+          image_name: ${{ variables.actionrules_image_name }}      
+
+- stage: build_push_object_detection
+  jobs:
+  - job: execute_build_push_object_detection
+    steps:
+    - template: ./templates/obj-detection-ci.yml
+      parameters:
+          imageRepository: ${{ variables.imageRepository }}
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+          unittest_reportprefix: ${{ variables.unittest_reportprefix }}
+          pythonversion: ${{ variables.pythonversion }}
+          azure_connection_name: ${{ variables.azure_connection_name }}
+          keyvault_name: ${{ variables.keyvault_name }}  
+          acr_connect_name: $${{ variables.acr_connect_name}}        
+          project_name: ${{ variables.objdet_project_name }}      
+          image_name: ${{ variables.objdet_image_name }}      
+
+- stage: build_push_rtsp_imgcapture
+  jobs:
+  - job: execute_build_push_rtsp_imgcapture
+    steps:
+    - template: ./templates/rtsp-imgcapture-ci.yml
+      parameters:
+          imageRepository: ${{ variables.imageRepository }}
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+          unittest_reportprefix: ${{ variables.unittest_reportprefix }}
+          pythonversion: ${{ variables.pythonversion }}
+          azure_connection_name: ${{ variables.azure_connection_name }}
+          keyvault_name: ${{ variables.keyvault_name }}  
+          acr_connect_name: $${{ variables.acr_connect_name}}        
+          project_name: ${{ variables.imgcapture_project_name }}      
+          image_name: ${{ variables.imgcapture_image_name }}  
+
+- stage: bake_kustomize_pr_manifest
+  jobs:
+  - job: execute_bake_kustomize_pr_manifest
+    steps:
+    - template: ./templates/bake-manifest-ci.yml
+      parameters:
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+  - job: execute_make_pr_to_gitopsrepo
+    dependsOn: execute_bake_kustomize_pr_manifest
+    steps:
+    - template: ./templates/cd-mythicalscissors-pr.yml
+      parameters:
+          imageTag: ${{ variables.imageTag }}
+          workingDir: ${{ variables.workingDir }}
+          azure_connection_name: ${{ variables.azure_connection_name }}
+          keyvault_name: ${{ variables.keyvault_name }}  
+          acr_connect_name: $${{ variables.acr_connect_name}}        
+          src_repo_name: ${{ variables.src_repo_name }}      
+          ops_repo_name: ${{ variables.ops_repo_name }} 
+          manifests_bundle: $[ dependencies.AzureVariables.outputs['azureVariables.MANIFESTS_BUNDLE'] ]
