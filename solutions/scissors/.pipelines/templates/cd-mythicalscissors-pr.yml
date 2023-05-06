@@ -46,7 +46,7 @@ steps:
           echo "repo_url=$repo_url"
           GITTOKEN=$(GITTOKEN)
           GITCLASSICTOKEN=$(GITCLASSICTOKEN)
-          DEST_BRANCH="${{ parameters.src_repo_name }}/BUILD/${{ parameters.imageTag }}"
+          DEST_BRANCH="$(src_repo_name)/BUILD/$(imageTag)"
           echo "DEST_BRANCH=$DEST_BRANCH"
           DEST_FOLDER=$(GITOPSDESTFOLDER)
           echo "DEST_FOLDER=$DEST_FOLDER"
@@ -64,7 +64,7 @@ steps:
           git status
 
           # Copy baked manifest bundle into readytodeploy directory
-          cp ${{ parameters.manifests_bundle }} ./readytodeploy
+          cp $(manifests_bundle) ./readytodeploy
           git add -A
           echo "git status"
           git status
