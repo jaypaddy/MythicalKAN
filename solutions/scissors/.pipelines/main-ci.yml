@@ -70,8 +70,6 @@ stages:
           imageTag: ${{ variables.imageTag }}
           workingDir: ${{ variables.workingDir }}
 
-- stage: make_pr_to_gitopsrepo
-  jobs:
   - job: execute_make_pr_to_gitopsrepo
     dependsOn: bake_kustomize_manifest
     steps:

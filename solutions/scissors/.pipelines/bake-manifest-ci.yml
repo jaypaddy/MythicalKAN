@@ -29,7 +29,8 @@ steps:
       kustomizationPath:  $(parameters.workingDir)/solutions/scissors/.deployment/kustomize/dev
 
   - task: Bash@3
-    name: 'Display Baked Manifest'
+    name: display_bake
+    displayName: Display baked Manifest
     inputs:
       targetType: 'inline'
       script: |
