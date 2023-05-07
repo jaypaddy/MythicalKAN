@@ -32,7 +32,7 @@ steps:
       targetType: 'inline'
       script: |
           #!/bin/bash
-          echo "VAR Manifests Bundle:" $(MANIFESTS_BUNDLE)
+          #echo "VAR Manifests Bundle:" $(MANIFESTS_BUNDLE)
           echo "PARAM Manifests Bundle:" ${{ parameters.manifests_bundle }}
 
   # Commit this file to a Branch on ArcGitOps Repo
