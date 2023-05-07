@@ -1,0 +1,123 @@
+                             
+parameters:
+- name: imageTag
+  type: string
+- name: workingDir
+  type: string
+- name: azure_connection_name
+  type: string
+- name: keyvault_name
+  type: string
+- name: acr_connect_name
+  type: string  
+- name: src_repo_name
+  type: string
+
+ 
+     
+
+steps:
+
+# Update kustomization.yaml so we have the final manifest
+  - task: Bash@3
+    displayName: 'Generate Kustomization file'
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+          sed "s/IMAGE_TAG/BUILD-${{ parameters.imageTag }}/g" \
+              $(workingDir)/.deployment/manifests/kustomize/dev/kustomization.template.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/dev/kustomization.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/dev/kustomization.yaml
+
+  - task: KubernetesManifest@0
+    name: bake
+    displayName: Bake K8s manifests from kustomization path
+    inputs:
+      action: bake
+      renderType: kustomize
+      kustomizationPath:  $(workingDir)/.deployment/manifests/kustomize/dev
+
+  - task: Bash@3
+    name: display_bake
+    displayName: Display baked Manifest
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo "Manifest Bundle: $(bake.manifestsBundle)"
+        cat $(bake.manifestsBundle)
+
+  - task: AzureKeyVault@2
+    name: get_values_from_keyvault
+    inputs:
+      azureSubscription: ${{ parameters.azure_connection_name }}
+      KeyVaultName: ${{ parameters.keyvault_name }}
+      SecretsFilter: '*'
+      RunAsPreJob: true
+
+  # Commit baked file to a Branch on ArcGitOps Repo
+  - task: Bash@3
+    displayName: 'Post a PR on GitOps repo'
+    name: commit_baked_yaml
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+
+          pr_user_name="Jay Padmanabhan"
+          pr_user_email="jay_padmanabhan@hotmail.com"
+
+          git config --global user.email $pr_user_email
+          git config --global user.name $pr_user_name
+          set -eo pipefail  # fail on error
+
+          echo "GITOPSREPONAME=$(GITOPSREPONAME)"
+          echo "GITOPSURL=$(GITOPSURL)"
+
+          GITTOKEN=$(GITTOKEN)
+          GITCLASSICTOKEN=$(GITCLASSICTOKEN)
+          
+          dest_branch="$(src_repo_name)/BUILD/$(imageTag)"
+          echo "dest_branch=$dest_branch"
+          
+          echo "GITOPSDESTFOLDER=$GITOPSDESTFOLDER"
+          
+          echo "CLONEABLEGITOPSREPOURL=$(CLONEABLEGITOPSREPOURL)"
+          git clone $(CLONEABLEGITOPSREPOURL) 
+          echo "git clone $(CLONEABLEGITOPSREPOURL)"
+          ls -l
+          echo "cd $(GITOPSREPONAME)"
+          cd "$(GITOPSREPONAME)"
+          pwd
+          git branch $dest_branch
+          git checkout $dest_branch        
+          echo "git status"
+          git status
+
+          # Copy baked manifest bundle into readytodeploy directory
+          cp $(bake.manifestsBundle) "./$(GITOPSDESTFOLDER)"
+          git add -A
+          echo "git status"
+          git status
+          echo `git status --porcelain | head -1`
+          if [[ `git status --porcelain | head -1` ]]; then
+              git commit -m "deployment $dest_branch"
+              echo "Push to the deploy branch $dest_branch"
+              echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) $dest_branch"
+              git push --set-upstream $(CLONEABLEGITOPSREPOURL) $dest_branch
+
+              # Create a PR 
+              echo "Create a PR to $DEST_BRANCH"
+              
+              export GITHUB_TOKEN=$GITCLASSICTOKEN
+              pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head $dest_branch --title "GitOps Deployment $(imageTag)" --body "Deploy to $dest_branch")
+              echo $pr_response
+              if [[ "$AUTO_MERGE" == "Y" ]]; then
+                  pr_num="${pr_response##*pull/}"
+                  echo $pr_num
+                  gh pr merge $pr_num -m -d --repo $(CLONEABLEGITOPSREPOURL)
+              fi
+          fi          
+
+
+         

@@ -11,21 +11,11 @@ pool:
 
 stages:
 
-- stage: bake_kustomize_pr_manifest
+- stage: bake_commit_pr_manifest
   jobs:
-  - job: execute_bake_kustomize_pr_manifest
+  - job: execute_bake_commit_pr_to_gitopsrepo
     steps:
-    - template: ./templates/bake-manifest-ci.yml
-      parameters:
-          imageTag: 101
-          workingDir: ${{ variables.workingDir }}
-
-  - job: execute_make_pr_to_gitopsrepo
-    dependsOn: execute_bake_kustomize_pr_manifest
-    variables:
-      MANIFESTS_BUNDLE: $[ dependencies.execute_bake_kustomize_pr_manifest.outputs['display_bake.MANIFESTS_BUNDLE'] ]
-    steps:
-    - template: ./templates/cd-mythicalscissors-pr.yml
+    - template: ./templates/bake-commit-pr.yml
       parameters:
           imageTag: ${{ variables.imageTag }}
           workingDir: ${{ variables.workingDir }}
@@ -33,5 +23,3 @@ stages:
           keyvault_name: ${{ variables.keyvault_name }}  
           acr_connect_name: $${{ variables.acr_connect_name}}        
           src_repo_name: ${{ variables.src_repo_name }}      
-          ops_repo_name: ${{ variables.ops_repo_name }} 
-          manifests_bundle: "Hello"
