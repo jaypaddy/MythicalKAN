@@ -13,6 +13,8 @@ parameters:
   type: string
 - name: ops_repo_name
   type: string
+- name: manifests_bundle
+  type: string  
 
 steps:
   - task: AzureKeyVault@2
@@ -21,6 +23,18 @@ steps:
       KeyVaultName: ${{ parameters.keyvault_name }}
       SecretsFilter: '*'
       RunAsPreJob: true
+
+  # Commit this file to a Branch on ArcGitOps Repo
+  - task: Bash@3
+    name: display_variable
+    displayName: 'Display Variable'
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+          echo "VAR Manifests Bundle:" $(MANIFESTS_BUNDLE)
+          echo "PARAM Manifests Bundle:" ${{ parameters.manifests_bundle }}
+
   # Commit this file to a Branch on ArcGitOps Repo
   - task: Bash@3
     displayName: 'Post a PR on GitOps repo'
@@ -61,8 +75,8 @@ steps:
           git status
 
           # Copy baked manifest bundle into readytodeploy directory
-          echo "Manifests Bundle:" $MANIFESTS_BUNDLE
-          cp $MANIFESTS_BUNDLE ./readytodeploy
+          echo "Manifests Bundle:" $(MANIFESTS_BUNDLE)
+          cp $(MANIFESTS_BUNDLE) ./readytodeploy
           git add -A
           echo "git status"
           git status

@@ -34,3 +34,4 @@ stages:
           acr_connect_name: $${{ variables.acr_connect_name}}        
           src_repo_name: ${{ variables.src_repo_name }}      
           ops_repo_name: ${{ variables.ops_repo_name }} 
+          manifests_bundle: $[ dependencies.execute_bake_kustomize_pr_manifest.outputs['display_bake.MANIFESTS_BUNDLE'] ]
