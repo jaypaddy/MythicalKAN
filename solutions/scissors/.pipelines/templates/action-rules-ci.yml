@@ -49,6 +49,23 @@ steps:
     displayName: 'install requirements.txt'
     workingDirectory: '${{ parameters.workingDir }}/${{ parameters.project_name }}'
 
+  - script: |
+      python -m pytest \
+      --junitxml=$(Common.TestResultsDirectory)/${{ variables.unittest_reportprefix }}_unittest-results.xml \
+      --cov=. \
+      --verbose \
+      --cov-report=xml:$(Common.TestResultsDirectory)/${{ variables.unittest_reportprefix }}_coverage.xml .
+    displayName: 'Run unit tests'
+    workingDirectory: '${{ parameters.workingDir }}/${{ parameters.project_name }}'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish unit test results'
+    inputs:
+      testResultsFiles: '**/*_unittest-results.xml'
+      testRunTitle: 'Unit tests'
+      failTaskOnFailedTests: true
+      searchFolder: $(Common.TestResultsDirectory)
+
   - task: Docker@2
     displayName: 'Build & Push Action Rules docker image'
     name: dockerBuild

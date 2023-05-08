@@ -44,7 +44,23 @@ steps:
       pip install pytest-cov
     displayName: 'install pytest'
 
- # Action Rules 
+  - script: |
+      python -m pytest \
+      --junitxml=$(Common.TestResultsDirectory)/${{ variables.unittest_reportprefix }}_unittest-results.xml \
+      --cov=. \
+      --verbose \
+      --cov-report=xml:$(Common.TestResultsDirectory)/${{ variables.unittest_reportprefix }}_coverage.xml .
+    displayName: 'Run unit tests'
+    workingDirectory: '${{ parameters.workingDir }}/${{ parameters.project_name }}'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish unit test results'
+    inputs:
+      testResultsFiles: '**/*_unittest-results.xml'
+      testRunTitle: 'Unit tests'
+      failTaskOnFailedTests: true
+      searchFolder: $(Common.TestResultsDirectory)
+
   - script: |
       pip install -r requirements.txt
     displayName: 'install requirements.txt'

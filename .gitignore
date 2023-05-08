@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Unit Tests output
+.coverage
+coverage.xml
+junit/
+*.xm
