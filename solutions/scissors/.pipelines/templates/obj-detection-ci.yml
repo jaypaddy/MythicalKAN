@@ -45,6 +45,11 @@ steps:
     displayName: 'install pytest'
 
   - script: |
+      pip install -r requirements.txt
+    displayName: 'install requirements.txt'
+    workingDirectory: '${{ parameters.workingDir }}/${{ parameters.project_name }}'
+
+  - script: |
       python -m pytest \
       --junitxml=$(Common.TestResultsDirectory)/${{ variables.unittest_reportprefix }}_unittest-results.xml \
       --cov=. \
