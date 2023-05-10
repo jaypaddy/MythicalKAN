@@ -36,7 +36,12 @@ steps:
       script: |
           #!/bin/bash
           echo "RTSPURL:$(RTSPURL)"
-          sed "s/RTSPURL/$(RTSPURL)/g" \
+          # Escape /, ! in RTSPURL
+          echo $(RTSPURL) > RTSPURL.txt
+          rtsp_url=`sed "s/\/\//\/\\\/\\abc/g"  RTSPURL.txt`
+          echo $rtsp_url > RTSPURL.txt
+          rtsp_url=`sed "s/\!/\\\!/g"  RTSPURL.txt`
+          sed "s/RTSPURL/$rtsp_url/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
