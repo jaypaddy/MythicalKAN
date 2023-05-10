@@ -105,7 +105,6 @@ steps:
           echo "CLONEABLEGITOPSREPOURL=$(CLONEABLEGITOPSREPOURL)"
           git clone $(CLONEABLEGITOPSREPOURL) 
           echo "git clone $(CLONEABLEGITOPSREPOURL)"
-          ls -l
           echo "cd $(GITOPSREPONAME)"
           cd "$(GITOPSREPONAME)"
           pwd
@@ -117,29 +116,26 @@ steps:
           # Copy baked manifest bundle into readytodeploy directory
           cp $(bake.manifestsBundle) "./$(GITOPSDESTFOLDER)"
           echo "Displaying the final Kustomized manifest"
-          ls ./$(GITOPSDESTFOLDER)
+          ls -l ./$(GITOPSDESTFOLDER)
           git add -A
           echo "git status"
           git status
-          echo `git status --porcelain | head -1`
-          if `git status --porcelain | head -1`; then
-              git commit -m "deployment ${{ parameters.dest_branch}}"
-              echo "Push to the deploy branch ${{ parameters.dest_branch}}"
-              echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}"
-              git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}
+          git commit -m "deployment ${{ parameters.dest_branch}}"
+          echo "Push to the deploy branch ${{ parameters.dest_branch}}"
+          echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}"
+          git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}
 
-              # Create a PR 
-              echo "Create a PR to ${{ parameters.dest_branch}}"
-              
-              export GITHUB_TOKEN=$GITCLASSICTOKEN
-              pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head ${{ parameters.dest_branch }} --title "GitOps Deployment $(imageTag)" --body "Deploy to ${{ parameters.dest_branch }}")
-              echo $pr_response
-              if "$AUTO_MERGE" == "Y"; then
-                  pr_num="${pr_response##*pull/}"
-                  echo $pr_num
-                  gh pr merge $pr_num -m -d --repo $(CLONEABLEGITOPSREPOURL)
-              fi
-          fi          
+          # Create a PR 
+          echo "Create a PR to ${{ parameters.dest_branch}}"
+          
+          export GITHUB_TOKEN=$(GITCLASSICTOKEN)
+          pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head ${{ parameters.dest_branch }} --title "GitOps Deployment $(imageTag)" --body "Deploy to ${{ parameters.dest_branch }}")
+          echo $pr_response
+          if "$AUTO_MERGE" == "Y"; then
+              pr_num="${pr_response##*pull/}"
+              echo $pr_num
+              gh pr merge $pr_num -m -d --repo $(CLONEABLEGITOPSREPOURL)
+          fi
 
 
          
