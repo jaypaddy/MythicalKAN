@@ -139,7 +139,7 @@ steps:
           GITCLASSICTOKEN=$(GITCLASSICTOKEN)
           
           #dest_branch="$(src_repo_name)/BUILD/$(imageTag)"
-          echo "dest_branch=$(dest_branch)"
+          echo "dest_branch=${{ parameters.dest_branch }}"
           
           echo "GITOPSDESTFOLDER=$GITOPSDESTFOLDER"
           
@@ -150,8 +150,8 @@ steps:
           echo "cd $(GITOPSREPONAME)"
           cd "$(GITOPSREPONAME)"
           pwd
-          git branch $(dest_branch)
-          git checkout $(dest_branch)       
+          git branch ${{ parameters.dest_branch }}
+          git checkout ${{ parameters.dest_branch }}       
           echo "git status"
           git status
 
@@ -162,16 +162,16 @@ steps:
           git status
           echo `git status --porcelain | head -1`
           if [[ `git status --porcelain | head -1` ]]; then
-              git commit -m "deployment $(dest_branch)"
-              echo "Push to the deploy branch $(dest_branch)"
-              echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) $(dest_branch)"
-              git push --set-upstream $(CLONEABLEGITOPSREPOURL) $(dest_branch)
+              git commit -m "deployment ${{ parameters.dest_branch}}""
+              echo "Push to the deploy branch ${{ parameters.dest_branch}}"
+              echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}"
+              git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}
 
               # Create a PR 
-              echo "Create a PR to $(dest_branch)"
+              echo "Create a PR to ${{ parameters.dest_branch}}"
               
               export GITHUB_TOKEN=$GITCLASSICTOKEN
-              pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head $(dest_branch) --title "GitOps Deployment $(imageTag)" --body "Deploy to $(dest_branch)")
+              pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head ${{ parameters.dest_branch }} --title "GitOps Deployment $(imageTag)" --body "Deploy to ${{ parameters.dest_branch }}")
               echo $pr_response
               if [[ "$AUTO_MERGE" == "Y" ]]; then
                   pr_num="${pr_response##*pull/}"
