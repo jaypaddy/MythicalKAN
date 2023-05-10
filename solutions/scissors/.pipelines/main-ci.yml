@@ -23,4 +23,4 @@ stages:
           keyvault_name: ${{ variables.keyvault_name }}  
           acr_connect_name: $${{ variables.acr_connect_name}}        
           src_repo_name: ${{ variables.src_repo_name }}  
-          dest_branch:  DEV/${{ variables.src_repo_name) }}/$(imageTag) 
+          dest_branch:  DEV/${{ variables.src_repo_name }}/$(imageTag) 
