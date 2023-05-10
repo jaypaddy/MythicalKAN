@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: mythicalscissors-config
 data:
-  RTSP_URL: ABC
+  RTSP_URL: {{ RTSPURL }}
   CLOUD_BLOB_CONN_STRING: [[ CLOUDBLOBCONNSTRING ]]
   EDGE_BLOB_CONN_STRING: {{ EDGEBLOBCONNSTRING }}
   EDGE_INFERENCE_URL:   {{ EDGEINFERENCEURL }}
