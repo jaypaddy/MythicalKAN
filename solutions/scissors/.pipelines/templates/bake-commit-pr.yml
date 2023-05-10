@@ -35,38 +35,38 @@ steps:
       targetType: 'inline'
       script: |
           #!/bin/bash
-          sed "s/%% RTSPURL %%/$(RTSPURL)/g" \
+          sed "s/RTSPURL/$(RTSPURL)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap1.yaml
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap1.yaml
-          sed "s/@@ CLOUDBLOBCONNSTRING @@/$(CLOUDBLOBCONNSTRING)/g" \
+          sed "s/CLOUDBLOBCONNSTRING/$(CLOUDBLOBCONNSTRING)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap1.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap2.yaml
-          sed "s/%% EDGEBLOBCONNSTRING %%/$(EDGEBLOBCONNSTRING)/g" \
+          sed "s/EDGEBLOBCONNSTRING/$(EDGEBLOBCONNSTRING)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap2.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap3.yaml
-          sed "s/%% EDGEINFERENCEURL %%/$(EDGEINFERENCEURL)/g" \
+          sed "s/EDGEINFERENCEURL/$(EDGEINFERENCEURL)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap3.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap4.yaml
-          sed "s/%% EDGEBLOBCONTAINERNAME %%/$(EDGEBLOBCONTAINERNAME)/g" \
+          sed "s/EDGEBLOBCONTAINERNAME/$(EDGEBLOBCONTAINERNAME)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap4.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap5.yaml
-          sed "s/%% LOGGINGLEVEL %%/$({{ LOGGINGLEVEL }})/g" \
+          sed "s/LOGGINGLEVEL/$({{ LOGGINGLEVEL }})/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap5.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap6.yaml
-          sed "s/%% APPNAME %%/$(APPNAME)/g" \
+          sed "s/APPNAME/$(APPNAME)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap6.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap7.yaml
-          sed "s/%% SCOPEKEYS %%/$(SCOPEKEYS)/g" \
+          sed "s/SCOPEKEYS/$(SCOPEKEYS)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap7.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap8.yaml
-          sed "s/%% SCOPEVALUES %%/$(SCOPEVALUES)/g" \
+          sed "s/SCOPEVALUES/$(SCOPEVALUES)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap8.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap9.yaml
-          sed "s/%% PROMETHEUSPORT %%/$(PROMETHEUSPORT)/g" \
+          sed "s/PROMETHEUSPORT/$(PROMETHEUSPORT)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap9.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap10.yaml
-          sed "s/%% SLEEPTIME %%/$(SLEEPTIME)/g" \
+          sed "s/SLEEPTIME/$(SLEEPTIME)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap10.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
@@ -92,20 +92,20 @@ steps:
       targetType: 'inline'
       script: |
           #!/bin/bash
-          sed "s/@@ ACR @@/$(ACR)/g" \
+          sed "s/ACR/$(ACR)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg-template.json \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg1.json
 
-          sed "s/@@ ACRUSERNAME @@/$(ACRUSERNAME)/g" \
+          sed "s/ACRUSERNAME/$(ACRUSERNAME)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg1.json \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg2.json
 
-          sed "s/@@ ACRPASSWORD @@/$(ACRPASSWORD)/g" \
+          sed "s/ACRPASSWORD/$(ACRPASSWORD)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg2.json \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg3.json
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
 
-          sed "s/@@ CLOUDBLOBCONNSTRING @@/$(CLOUDBLOBCONNSTRING)/g" \
+          sed "s/CLOUDBLOBCONNSTRING/$(CLOUDBLOBCONNSTRING)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg3.json \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg.json
 
@@ -174,7 +174,7 @@ steps:
           echo "git status"
           git status
           echo `git status --porcelain | head -1`
-          if @@ `git status --porcelain | head -1` @@; then
+          if `git status --porcelain | head -1`; then
               git commit -m "deployment ${{ parameters.dest_branch}}"
               echo "Push to the deploy branch ${{ parameters.dest_branch}}"
               echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}"
@@ -186,7 +186,7 @@ steps:
               export GITHUB_TOKEN=$GITCLASSICTOKEN
               pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head ${{ parameters.dest_branch }} --title "GitOps Deployment $(imageTag)" --body "Deploy to ${{ parameters.dest_branch }}")
               echo $pr_response
-              if @@ "$AUTO_MERGE" == "Y" @@; then
+              if "$AUTO_MERGE" == "Y"; then
                   pr_num="${pr_response##*pull/}"
                   echo $pr_num
                   gh pr merge $pr_num -m -d --repo $(CLONEABLEGITOPSREPOURL)
