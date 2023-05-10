@@ -39,37 +39,6 @@ steps:
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap1.yaml
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap1.yaml
-          sed "s/CLOUDBLOBCONNSTRING/$(CLOUDBLOBCONNSTRING)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap1.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap2.yaml
-          sed "s/EDGEBLOBCONNSTRING/$(EDGEBLOBCONNSTRING)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap2.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap3.yaml
-          sed "s/EDGEINFERENCEURL/$(EDGEINFERENCEURL)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap3.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap4.yaml
-          sed "s/EDGEBLOBCONTAINERNAME/$(EDGEBLOBCONTAINERNAME)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap4.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap5.yaml
-          sed "s/LOGGINGLEVEL/$({{ LOGGINGLEVEL }})/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap5.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap6.yaml
-          sed "s/APPNAME/$(APPNAME)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap6.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap7.yaml
-          sed "s/SCOPEKEYS/$(SCOPEKEYS)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap7.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap8.yaml
-          sed "s/SCOPEVALUES/$(SCOPEVALUES)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap8.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap9.yaml
-          sed "s/PROMETHEUSPORT/$(PROMETHEUSPORT)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap9.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap10.yaml
-          sed "s/SLEEPTIME/$(SLEEPTIME)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap10.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
 
 
 # Update configMap.yaml with values from KeyVault
