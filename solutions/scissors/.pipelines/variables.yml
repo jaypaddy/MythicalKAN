@@ -22,3 +22,4 @@ variables:
   #ImageCapture
   imgcapture_project_name: "RTSPImageCapturePY"
   imgcapture_image_name: "rtspimgcapture"  
+

@@ -12,23 +12,90 @@ parameters:
   type: string  
 - name: src_repo_name
   type: string
+- name: dest_branch
+  type: string  
 
  
      
 
 steps:
 
+  - task: AzureKeyVault@2
+    name: get_values_from_keyvault
+    inputs:
+      azureSubscription: ${{ parameters.azure_connection_name }}
+      KeyVaultName: ${{ parameters.keyvault_name }}
+      SecretsFilter: '*'
+      RunAsPreJob: true
+
 # Update kustomization.yaml so we have the final manifest
   - task: Bash@3
-    displayName: 'Generate Kustomization file'
+    displayName: 'Update ConfigMap template file to build ConfigMap values'
     inputs:
       targetType: 'inline'
       script: |
           #!/bin/bash
-          sed "s/IMAGE_TAG/BUILD-${{ parameters.imageTag }}/g" \
-              $(workingDir)/.deployment/manifests/kustomize/dev/kustomization.template.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/dev/kustomization.yaml
-          cat $(workingDir)/.deployment/manifests/kustomize/dev/kustomization.yaml
+          sed "s/{{ RTSPURL }}/$(RTSPURL)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/[[ CLOUDBLOBCONNSTRING ]]/$(CLOUDBLOBCONNSTRING)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/{{ EDGEBLOBCONNSTRING }}/$(EDGEBLOBCONNSTRING)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/{{ EDGEINFERENCEURL }}/$(EDGEINFERENCEURL)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/{{ EDGEBLOBCONTAINERNAME }}/$(EDGEBLOBCONTAINERNAME)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/{{ LOGGINGLEVEL }}/$({{ LOGGINGLEVEL }})/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/{{ APPNAME }}/$(APPNAME)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/{{ SCOPEKEYS }}/$(SCOPEKEYS)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/{{ SCOPEVALUES }}/$(SCOPEVALUES)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/{{ PROMETHEUSPORT }}/$(PROMETHEUSPORT)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed "s/{{ SLEEPTIME }}/$(SLEEPTIME)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+
+
+# Update configMap.yaml with values from KeyVault
+# For now KeyVault as a store. In the future this will be replaced with a REST 
+# endpoint that will provide the values for the configMap based on an Identifier 
+  - task: Bash@3
+    displayName: 'Update Kustomization template file with ImageTag values'
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+          sed "s/IMAGE_TAG/${{ parameters.imageTag }}/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.template.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
+
+  - task: Bash@3
+    displayName: 'Update Docket Registry Secret template file with Docker Secret Registry values'
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+          sed "s/RTSPURL/${{ parameters.imageTag }}/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg-template.json \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg.json
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
+
 
   - task: KubernetesManifest@0
     name: bake
@@ -36,7 +103,7 @@ steps:
     inputs:
       action: bake
       renderType: kustomize
-      kustomizationPath:  $(workingDir)/.deployment/manifests/kustomize/dev
+      kustomizationPath:  $(workingDir)/.deployment/manifests/kustomize/overlay
 
   - task: Bash@3
     name: display_bake
@@ -47,13 +114,7 @@ steps:
         echo "Manifest Bundle: $(bake.manifestsBundle)"
         cat $(bake.manifestsBundle)
 
-  - task: AzureKeyVault@2
-    name: get_values_from_keyvault
-    inputs:
-      azureSubscription: ${{ parameters.azure_connection_name }}
-      KeyVaultName: ${{ parameters.keyvault_name }}
-      SecretsFilter: '*'
-      RunAsPreJob: true
+
 
   # Commit baked file to a Branch on ArcGitOps Repo
   - task: Bash@3
@@ -77,8 +138,8 @@ steps:
           GITTOKEN=$(GITTOKEN)
           GITCLASSICTOKEN=$(GITCLASSICTOKEN)
           
-          dest_branch="$(src_repo_name)/BUILD/$(imageTag)"
-          echo "dest_branch=$dest_branch"
+          #dest_branch="$(src_repo_name)/BUILD/$(imageTag)"
+          echo "dest_branch=$(dest_branch)"
           
           echo "GITOPSDESTFOLDER=$GITOPSDESTFOLDER"
           
@@ -89,8 +150,8 @@ steps:
           echo "cd $(GITOPSREPONAME)"
           cd "$(GITOPSREPONAME)"
           pwd
-          git branch $dest_branch
-          git checkout $dest_branch        
+          git branch $(dest_branch)
+          git checkout $(dest_branch)       
           echo "git status"
           git status
 
@@ -101,16 +162,16 @@ steps:
           git status
           echo `git status --porcelain | head -1`
           if [[ `git status --porcelain | head -1` ]]; then
-              git commit -m "deployment $dest_branch"
-              echo "Push to the deploy branch $dest_branch"
-              echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) $dest_branch"
-              git push --set-upstream $(CLONEABLEGITOPSREPOURL) $dest_branch
+              git commit -m "deployment $(dest_branch)"
+              echo "Push to the deploy branch $(dest_branch)"
+              echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) $(dest_branch)"
+              git push --set-upstream $(CLONEABLEGITOPSREPOURL) $(dest_branch)
 
               # Create a PR 
-              echo "Create a PR to $DEST_BRANCH"
+              echo "Create a PR to $(dest_branch)"
               
               export GITHUB_TOKEN=$GITCLASSICTOKEN
-              pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head $dest_branch --title "GitOps Deployment $(imageTag)" --body "Deploy to $dest_branch")
+              pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head $(dest_branch) --title "GitOps Deployment $(imageTag)" --body "Deploy to $(dest_branch)")
               echo $pr_response
               if [[ "$AUTO_MERGE" == "Y" ]]; then
                   pr_num="${pr_response##*pull/}"

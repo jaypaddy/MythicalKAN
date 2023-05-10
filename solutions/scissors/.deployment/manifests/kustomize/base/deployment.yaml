@@ -1,28 +1,14 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: mythicalscissors-ns
-  labels:
-    name: mythicalscissors
+# Labels and Selectors applied by Kustomize
+# ImageTag applied by Kustomize
+# Environment Variables loaded using ConfigMap and Secret
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: objdetection
-  labels:
-    app: mythicalscissors
-  namespace: mythicalscissors-ns
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-    app: mythicalscissors
-    pod: objdetection
-    line: jp1913       
   template:
-    metadata:
-      labels:
-        ver: latest 
     spec:
       containers:
       - name: objectdetection
@@ -37,48 +23,63 @@ spec:
             name: metrics
         env:
           - name: RTSP_URL
-            value: rtsp://admin:GrandCam1913!@10.0.0.38:554
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: RTSP_URL # The key to fetch.
           - name: CLOUD_BLOB_CONN_STRING
             valueFrom:
               secretKeyRef:
                 name: cloud-blob-conn-string
                 key: CLOUD_BLOB_CONN_STRING            
-          - name: CLOUD_BLOB_CONN_STRING
           - name: EDGE_INFERENCE_URL
-            value: "http://mythicalscissorsobjdetectionsvc:8080/image"
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: EDGE_INFERENCE_URL # The key to fetch.
           - name: EDGE_BLOB_CONTAINER_NAME
-            value: "objectdetection"
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: EDGE_BLOB_CONTAINER_NAME # The key to fetch.
           - name: LOGGING_LEVEL
-            value: INFO
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: LOGGING_LEVEL # The key to fetch.
           - name: APP_NAME
-            value: mythicalscissors
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: APP_NAME # The key to fetch.
           - name: SCOPE_KEYS
-            value: "plant,edge,line,workload"
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: SCOPE_KEYS # The key to fetch.
           - name: SCOPE_VALUES
-            value: "FLOWERMOUND,MYTHICALAKSEE,FM407,MYTHICALSCISSORS"
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: SCOPE_VALUES # The key to fetch.
           - name: PROMETHEUS_PORT
-            value: 8081
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: PROMETHEUS_PORT # The key to fetch.
           - name: SLEEP_TIME
-            value : 1
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: SLEEP_TIME # The key to fetch.
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: actionrules
-  labels:
-    app: mythicalscissors
-  namespace: mythicalscissors-ns
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-    app: mythicalscissors
-    pod: actionrules
-    line: jp1913       
   template:
-    metadata:
-      labels:
-        ver: latest 
     spec:
       containers:
       - name: actionrules
@@ -93,36 +94,43 @@ spec:
             name: metrics
         env:
           - name: LOGGING_LEVEL
-            value: INFO
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: LOGGING_LEVEL # The key to fetch.
           - name: APP_NAME
-            value: mythicalscissors
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: APP_NAME # The key to fetch.
           - name: SCOPE_KEYS
-            value: "plant,edge,line,workload"
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: SCOPE_KEYS # The key to fetch.
           - name: SCOPE_VALUES
-            value: "FLOWERMOUND,MYTHICALAKSEE,FM407,MYTHICALSCISSORS"
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: SCOPE_VALUES # The key to fetch.
           - name: PROMETHEUS_PORT
-            value: 8081
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: PROMETHEUS_PORT # The key to fetch.
           - name: SLEEP_TIME
-            value : 1
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: SLEEP_TIME # The key to fetch.
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rtspimagecapture
-  labels:
-    app: mythicalscissors
-  namespace: mythicalscissors-ns
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-    app: mythicalscissors
-    pod: rtspimgcapture
-    line: jp1913       
   template:
-    metadata:
-      labels:
-        ver: latest 
     spec:
       containers:
       - name: rtspimagecapture
@@ -137,14 +145,32 @@ spec:
             name: metrics
         env:
           - name: LOGGING_LEVEL
-            value: INFO
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: LOGGING_LEVEL # The key to fetch.
           - name: APP_NAME
-            value: mythicalscissors
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: APP_NAME # The key to fetch.
           - name: SCOPE_KEYS
-            value: "plant,edge,line,workload"
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: SCOPE_KEYS # The key to fetch.
           - name: SCOPE_VALUES
-            value: "FLOWERMOUND,MYTHICALAKSEE,FM407,MYTHICALSCISSORS"
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: SCOPE_VALUES # The key to fetch.
           - name: PROMETHEUS_PORT
-            value: 8081
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: PROMETHEUS_PORT # The key to fetch.
           - name: SLEEP_TIME
-            value : 1
+            valueFrom:
+              configMapKeyRef:
+                name: mythicalscissors-config  # The ConfigMap this value comes from.
+                key: SLEEP_TIME # The key to fetch.

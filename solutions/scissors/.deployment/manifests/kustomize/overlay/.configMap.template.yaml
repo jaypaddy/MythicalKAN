@@ -1,4 +1,7 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mythicalscissors-config
 data:
   RTSP_URL: rtsp://admin:GrandCam1913!@10.0.0.38:554
   CLOUD_BLOB_CONN_STRING: "DefaultEndpointsProtocol=https;AccountName=mythicalisafactorystore;AccountKey=BSwBAM91L3LzDG8R1/aeZ5HRy75GcRO0lCBFNUl6Vl1PWUZL9Ld45b7Is1ECqawLrS7MknnLj1F8+AStcatWqQ==;EndpointSuffix=core.windows.net"
@@ -9,23 +12,15 @@ data:
   APP_NAME: mythicalscissors
   SCOPE_KEYS: plant,edge,line,workload
   SCOPE_VALUES: "FLOWERMOUND,MYTHICALAKSEE,FM407,MYTHICALSCISSORS"
-  PROMETHEUS_PORT: 8081
-  SLEEP_TIME: 1
+  PROMETHEUS_PORT: "8081"
+  SLEEP_TIME: "1"
 
-kind: ConfigMap
-metadata:
-  labels:
-    line: FM407
-    usecase: MYTHICALSCISSORS
-  name: mythicalscissors-config-mk80
-  namespace: mythicalscissors
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: cloud-blob-conn-string
-  namespace: mythicalscissors
 type: Opaque
 stringData:
-  EDGE_BLOB_CONN_STRING: "XYZ"
+  CLOUD_BLOB_CONN_STRING: "CLOUD_BLOB_CONN_STRING"
 ---

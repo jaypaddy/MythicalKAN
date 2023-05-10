@@ -1,14 +1,24 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
+bases:
 - ../base
+
+resources:
+- ./namespace.yaml
+- ./configMap.yaml
+
+namespace: mythicalscissors-ns
+commonLabels:
+  app: mythicalscissors
+  environment: dev
+  line: jp1913 
+  plant: mythicalaksee
 
 secretGenerator:
 - files:
   - secret-docker-reg.json
   name: regcred
   type: kubernetes.io/dockerconfigjson
-  namespace: mythicalscissors-ns
 
 images:
 - name: objdetection
