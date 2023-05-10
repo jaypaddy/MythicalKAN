@@ -38,6 +38,8 @@ steps:
           echo "RTSPURL:$(RTSPURL)"
           # Replace the string RTSPURL with values in the variable RTSPURL
           echo $RTSPURL > rtspurl.txt
+          echo "cat rtspurl.txt"
+          cat rtspurl.txt
           ESCAPEDRTSPURL=`sed "s|!|\\\!|g" rtspurl.txt`
           echo "ESCAPEDRTSPURL:$ESCAPEDRTSPURL"
           sed "s/RTSPURL/$ESCAPEDRTSPURL/g" \
