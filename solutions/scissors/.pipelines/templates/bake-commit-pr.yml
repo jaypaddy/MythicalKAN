@@ -39,10 +39,7 @@ steps:
           # Replace the string RTSPURL with values in the variable RTSPURL
           echo $RTSPURL > rtspurl.txt
           ESCAPEDRTSPURL=`sed "s|!|\\\!|g" rtspurl.txt`
-          # Escape
-          rtsp_url=`sed -e "s|RTSPURL|$ESCAPEDRTSPURL|g" ./escape.txt`           
-          echo $rtsp_url 
-          sed "s/RTSPURL/$rtsp_url/g" \
+          sed "s/RTSPURL/$ESCAPEDRTSPURL/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
