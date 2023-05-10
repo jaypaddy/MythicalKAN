@@ -38,6 +38,7 @@ steps:
           sed "s/{{ RTSPURL }}/$(RTSPURL)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap1.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap1.yaml
           sed "s/[[ CLOUDBLOBCONNSTRING ]]/$(CLOUDBLOBCONNSTRING)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap1.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap2.yaml
