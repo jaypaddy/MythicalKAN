@@ -28,30 +28,22 @@ steps:
       SecretsFilter: '*'
       RunAsPreJob: true
 
-# Update kustomization.yaml so we have the final manifest
+# Update configMap.yaml with values from KeyVault
+# For now KeyVault as a store. In the future this will be replaced with a REST 
+# endpoint that will provide the values for the configMap based on an Identifier 
   - task: Bash@3
     displayName: 'Update ConfigMap template file to build ConfigMap values'
     inputs:
       targetType: 'inline'
       script: |
-          #!/bin/bash
-          RTSP_URL="rtsp://admin:GrandCam1913!@10.0.0.38:554"
-          echo "RTSP_URL:$(RTSP_URL)"
-          # Replace the string RTSP_URL with values in the variable RTSP_URL
-          echo $(RTSP_URL) > rtspurl.txt
-          echo "cat rtspurl.txt"
-          cat rtspurl.txt
-          ESCAPEDRTSPURL=`sed "s|!|\\\!|g" rtspurl.txt`
-          echo "ESCAPEDRTSPURL:$ESCAPEDRTSPURL"
-          sed "s/RTSPURL/$ESCAPEDRTSPURL/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+        #!/usr/bin/perl
+        $templateyaml=`cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml`;
+        $templateyaml =~ s/RTSPURL/"$(RTSPURL)"/g; 
+        open(FH, '>', "$(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml") or die $!;
+        print FH $templateyaml;
+        close(FH);
+        cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
 
-
-# Update configMap.yaml with values from KeyVault
-# For now KeyVault as a store. In the future this will be replaced with a REST 
-# endpoint that will provide the values for the configMap based on an Identifier 
   - task: Bash@3
     displayName: 'Update Kustomization template file with ImageTag values'
     inputs:
