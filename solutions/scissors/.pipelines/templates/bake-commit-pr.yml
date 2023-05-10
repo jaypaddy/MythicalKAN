@@ -56,29 +56,6 @@ steps:
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
 
-  - task: Bash@3
-    displayName: 'Update Docket Registry Secret template file with Docker Secret Registry values'
-    inputs:
-      targetType: 'inline'
-      script: |
-          #!/bin/bash
-          sed "s/ACR/$(ACR)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg-template.json \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg1.json
-
-          sed "s/ACRUSERNAME/$(ACRUSERNAME)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg1.json \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg2.json
-
-          sed "s/ACRPASSWORD/$(ACRPASSWORD)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg2.json \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg3.json
-          cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
-
-          sed "s/CLOUDBLOBCONNSTRING/$(CLOUDBLOBCONNSTRING)/g" \
-              $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg3.json \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/secret-docker-reg.json
-
 
   - task: KubernetesManifest@0
     name: bake
