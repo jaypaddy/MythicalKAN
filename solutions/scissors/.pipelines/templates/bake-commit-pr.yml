@@ -35,9 +35,10 @@ steps:
       targetType: 'inline'
       script: |
           #!/bin/bash
-          echo "RTSPURL:$(RTSPURL)"
-          # Replace the string RTSPURL with values in the variable RTSPURL
-          echo $(RTSPURL) > rtspurl.txt
+          RTSP_URL="rtsp://admin:GrandCam1913!@10.0.0.38:554"
+          echo "RTSP_URL:$(RTSP_URL)"
+          # Replace the string RTSP_URL with values in the variable RTSP_URL
+          echo $(RTSP_URL) > rtspurl.txt
           echo "cat rtspurl.txt"
           cat rtspurl.txt
           ESCAPEDRTSPURL=`sed "s|!|\\\!|g" rtspurl.txt`
