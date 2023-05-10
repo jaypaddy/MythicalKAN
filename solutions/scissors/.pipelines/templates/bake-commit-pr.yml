@@ -36,11 +36,12 @@ steps:
       script: |
           #!/bin/bash
           echo "RTSPURL:$(RTSPURL)"
-          # Escape /, ! in RTSPURL
-          echo $(RTSPURL) > RTSPURL.txt
-          rtsp_url=`sed "s/\/\//\/\\\/\\abc/g"  RTSPURL.txt`
-          echo $rtsp_url > RTSPURL.txt
-          rtsp_url=`sed "s/\!/\\\!/g"  RTSPURL.txt`
+          # Replace the string RTSPURL with values in the variable RTSPURL
+          echo $RTSPURL > rtspurl.txt
+          ESCAPEDRTSPURL=`sed "s|!|\\\!|g" rtspurl.txt`
+          # Escape
+          rtsp_url=`sed -e "s|RTSPURL|$ESCAPEDRTSPURL|g" ./escape.txt`           
+          echo $rtsp_url 
           sed "s/RTSPURL/$rtsp_url/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
