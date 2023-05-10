@@ -116,6 +116,8 @@ steps:
 
           # Copy baked manifest bundle into readytodeploy directory
           cp $(bake.manifestsBundle) "./$(GITOPSDESTFOLDER)"
+          echo "Displaying the final Kustomized manifest"
+          cat "./$(GITOPSDESTFOLDER)/$(bake.manifestsBundle)"
           git add -A
           echo "git status"
           git status
