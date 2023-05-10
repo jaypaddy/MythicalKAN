@@ -28,6 +28,16 @@ steps:
       SecretsFilter: '*'
       RunAsPreJob: true
 
+  - task: Bash@3
+    displayName: 'Install Perl'
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+          sudo apt-get update
+          sudo apt-get install -y perl
+
+
 # Update configMap.yaml with values from KeyVault
 # For now KeyVault as a store. In the future this will be replaced with a REST 
 # endpoint that will provide the values for the configMap based on an Identifier 
@@ -42,7 +52,7 @@ steps:
         open(FH, '>', "$(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml") or die $!;
         print FH $templateyaml;
         close(FH);
-        cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+      
 
   - task: Bash@3
     displayName: 'Update Kustomization template file with ImageTag values'
