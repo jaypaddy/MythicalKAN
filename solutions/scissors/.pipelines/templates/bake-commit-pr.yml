@@ -162,7 +162,7 @@ steps:
           git status
           echo `git status --porcelain | head -1`
           if [[ `git status --porcelain | head -1` ]]; then
-              git commit -m "deployment ${{ parameters.dest_branch}}""
+              git commit -m "deployment ${{ parameters.dest_branch}}"
               echo "Push to the deploy branch ${{ parameters.dest_branch}}"
               echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}"
               git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}
