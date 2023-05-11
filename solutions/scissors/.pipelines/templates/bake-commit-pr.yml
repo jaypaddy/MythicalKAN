@@ -36,7 +36,7 @@ steps:
       scriptLocation: inlineScript
       inlineScript: |
           az storage blob download -f . -c {{ parameters.target_environment }} -n config.json
-
+ 
 # Update configMap.yaml with values from KeyVault
 # For now KeyVault as a store. In the future this will be replaced with a REST 
 # endpoint that will provide the values for the configMap based on an Identifier 
