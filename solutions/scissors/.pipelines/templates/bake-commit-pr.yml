@@ -75,6 +75,8 @@ steps:
             $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
               > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
 
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+
      
 
   - task: Bash@3
