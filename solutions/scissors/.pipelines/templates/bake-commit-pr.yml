@@ -75,6 +75,7 @@ steps:
             $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
               > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
 
+          echo "Updated ConfigMap.yaml with values from BlobStorage"
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
 
      
