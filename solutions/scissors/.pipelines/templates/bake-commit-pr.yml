@@ -14,9 +14,8 @@ parameters:
   type: string
 - name: dest_branch
   type: string  
-
- 
-     
+- name: target_environment
+  type: string
 
 steps:
 
@@ -28,6 +27,16 @@ steps:
       SecretsFilter: '*'
       RunAsPreJob: true
 
+  - task: AzureCLI@2
+    displayName: 'Get config by Target Environment from Config Svc (BlobStorage)'
+    name: get_target_config
+    inputs:
+      azureSubscription: $(serviceConnectionName)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+          az storage blob download -f . -c {{ parameters.target_environment }} -n config.json
+
 # Update configMap.yaml with values from KeyVault
 # For now KeyVault as a store. In the future this will be replaced with a REST 
 # endpoint that will provide the values for the configMap based on an Identifier 
@@ -38,11 +47,60 @@ steps:
       targetType: 'inline'
       script: |
           #!/bin/bash
+
+          APP_NAME=$(jq .APP_NAME config.json)
+          CLOUD_BLOB_CONN_STRING=$(jq .CLOUD_BLOB_CONN_STRING config.json)
+          EDGE_BLOB_CONN_STRING=$(jq .EDGE_BLOB_CONN_STRING config.json)
+          EDGE_BLOB_CONTAINER_NAME=$(jq .EDGE_BLOB_CONTAINER_NAME config.json)
+          EDGE_INFERENCE_URL=$(jq .EDGE_INFERENCE_URL config.json)
+          LOGGING_LEVEL=$(jq .LOGGING_LEVEL config.json)
+          PROMETHEUS_PORT=$(jq .PROMETHEUS_PORT config.json)
+          RTSP_URL=$(jq .RTSP_URL config.json)
+          SCOPE_KEYS=$(jq .SCOPE_KEYS config.json)
+          SCOPE_VALUES=$(jq .SCOPE_VALUES config.json)
+          SLEEP_TIME=$(jq .SLEEP_TIME config.json)
+
           sed -e "s|RTSPURL|$(RTSPURL)|g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-      
+          sed -e "s|CLOUDBLOBCONNSTRING|$(CLOUDBLOBCONNSTRING)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed -e "s|EDGEBLOBCONNSTRING|$(EDGEBLOBCONNSTRING)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed -e "s|EDGEINFERENCEURL|$(EDGEINFERENCEURL)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed -e "s|EDGEBLOBCONTAINERNAME|$(EDGEBLOBCONTAINERNAME)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed -e "s|LOGGINGLEVEL|$(LOGGINGLEVEL)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed -e "s|APPNAME|$(APPNAME)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed -e "s|SCOPEKEYS|$(SCOPEKEYS)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed -e "s|SCOPEKEYS|$(SCOPEKEYS)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed -e "s|SCOPEVALUES|$(SCOPEVALUES)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+          sed -e "s|PROMETHEUSPORT|$(PROMETHEUSPORT)|g" \
+            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+     
 
   - task: Bash@3
     displayName: 'Update Kustomization template file with ImageTag values'

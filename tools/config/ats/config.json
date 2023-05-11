@@ -1,0 +1,17 @@
+{
+    
+    "APP_NAME": "APPNAME",
+    "CLOUD_BLOB_CONN_STRING": "DefaultEndpointsProtocol=https;AccountName=mythicalisafactorystore;AccountKey=BSwBAM91L3LzDG8R1/aeZ5HRy75GcRO0lCBFNUl6Vl1PWUZL9Ld45b7Is1ECqawLrS7MknnLj1F8+AStcatWqQ==;EndpointSuffix=core.windows.net",
+    "EDGE_BLOB_CONN_STRING": "EDGEBLOBCONNSTRING",
+    "EDGE_BLOB_CONTAINER_NAME": "EDGEBLOBCONTAINERNAME",
+    "EDGE_INFERENCE_URL": "EDGEINFERENCEURL",
+    "LOGGING_LEVEL": "INFO",
+    "PROMETHEUS_PORT": "9600",
+    "RTSP_URL": "rtsp://admin:GrandCam1913!@10.0.0.38:554",
+    "SCOPE_KEYS": "plant,edge,line,workload",
+    "SCOPE_VALUES": "FLOWERMOUND,ATS,mk80,MYTHICALSCISSORS",
+    "SLEEP_TIME": "1",
+    "ACR":"mythicalcon.azurecr.io",
+    "ACR_USERNAME":"mythicalcon",
+    "ACR_PASSWORD":"wkBUTOc46NBlJtFVFrgl+vrrCIXKl3xu"
+}
