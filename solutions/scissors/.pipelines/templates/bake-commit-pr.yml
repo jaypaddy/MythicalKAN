@@ -16,6 +16,8 @@ parameters:
   type: string  
 - name: target_environment
   type: string
+- name: config_storage_account_name
+  type: string
 
 steps:
 
@@ -35,7 +37,10 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-          az storage blob download -f config.json -c ${{ parameters.target_environment }} -n config.json
+          az storage blob download -f config.json   \
+            --account-name ${{ parameters.config_storage_account_name }} \
+            --container-name ${{ parameters.target_environment }} \
+            -n config.json
  
 # Update configMap.yaml with values from KeyVault
 # For now KeyVault as a store. In the future this will be replaced with a REST 

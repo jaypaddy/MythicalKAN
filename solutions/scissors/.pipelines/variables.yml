@@ -24,3 +24,4 @@ variables:
   imgcapture_image_name: "rtspimgcapture"  
 
   target_environment: "dev"
+  config_storage_account_name: "mythicaldigitalfactory"
