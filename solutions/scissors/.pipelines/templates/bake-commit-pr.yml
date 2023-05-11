@@ -67,8 +67,12 @@ steps:
           SCOPE_VALUES=$(jq .SCOPE_VALUES config.json)
           SLEEP_TIME=$(jq .SLEEP_TIME config.json)
 
-          sed -e "s|\"RTSP_URL\"|"$RTSP_URL"|g" \
+          sed -e "s|\"APP_NAME\"|$APP_NAME|g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+
+          sed -e "s|\"RTSP_URL\"|$RTSP_URL|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
 
           echo "Updated ConfigMap.yaml with values from BlobStorage"
