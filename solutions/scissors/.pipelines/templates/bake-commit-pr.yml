@@ -70,33 +70,11 @@ steps:
           sed -e "s|\"RTSP_URL\"|\"$RTSP_URL\"|g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+
           sed -e "s|\"CLOUD_BLOB_CONN_STRING\"|\"$CLOUD_BLOB_CONN_STRING\"|g" \
             $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
               > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          sed -e "s|\"EDGE_BLOB_CONN_STRING\"|\"$EDGE_BLOB_CONN_STRING\"|g" \
-            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
-              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          sed -e "s|\"EDGE_INFERENCE_URL\"|\"$EDGE_INFERENCE_URL\"|g" \
-            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
-              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          sed -e "s|\"EDGE_BLOB_CONTAINER_NAME\"|\"$EDGE_BLOB_CONTAINER_NAME\"|g" \
-            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
-              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          sed -e "s|\"LOGGING_LEVEL\"|\"$LOGGING_LEVEL\"|g" \
-            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
-              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          sed -e "s|\"APP_NAME\"|\"$APP_NAME\"|g" \
-            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
-              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          sed -e "s|\"SCOPE_KEYS\"|\"$SCOPE_KEYS\")"|g" \
-            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
-              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          sed -e "s|\"SCOPE_VALUES\"|\"$SCOPE_VALUES\"|g" \
-            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
-              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
-          sed -e "s|\"PROMETHEUS_PORT\"|\"$PROMETHEUS_PORT\"|g" \
-            $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml \
-              > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+
      
 
   - task: Bash@3
