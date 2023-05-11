@@ -35,7 +35,7 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-          az storage blob download -f . -c {{ parameters.target_environment }} -n config.json
+          az storage blob download -f . -c ${{ parameters.target_environment }} -n config.json
  
 # Update configMap.yaml with values from KeyVault
 # For now KeyVault as a store. In the future this will be replaced with a REST 
@@ -45,7 +45,7 @@ steps:
     displayName: 'Update ConfigMap template file to build ConfigMap values'
     inputs:
       targetType: 'inline'
-      script: |
+      script: |      
           #!/bin/bash
 
           APP_NAME=$(jq .APP_NAME config.json)
