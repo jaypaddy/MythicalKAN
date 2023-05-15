@@ -1,0 +1,23 @@
+{
+    "KUBE":{
+        "APP_NAME": "APP_NAME",
+        "APP_VERSION": "APP_VERSION",
+        "ENVIRONMENT": "ENVIRONMENT",
+        "PLANT": "PLANT",           
+        "LINE": "LINE"            
+    },
+    "APP":
+    {
+        "RTSP_URL": "RTSP_URL",
+        "CLOUD_BLOB_CONN_STRING":  "CLOUD_BLOB_CONN_STRING",
+        "EDGE_BLOB_CONN_STRING": "EDGE_BLOB_CONN_STRING",
+        "EDGE_INFERENCE_URL":   "EDGE_INFERENCE_URL",
+        "EDGE_BLOB_CONTAINER_NAME": "EDGE_BLOB_CONTAINER_NAME",
+        "LOGGING_LEVEL":  "LOGGING_LEVEL",
+        "SCOPE_KEYS":   "SCOPE_KEYS",
+        "SCOPE_VALUES":   "SCOPE_VALUES",
+        "PROMETHEUS_PORT":    "PROMETHEUS_PORT",
+        "SLEEP_TIME":     "SLEEP_TIME",
+        "ENVIRONMENT": "ENVIRONMENT"     
+    }
+}

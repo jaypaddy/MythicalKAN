@@ -1,0 +1,132 @@
+                             
+parameters:
+- name: stageBuildTag
+  type: string
+- name: workingDir
+  type: string
+- name: azure_connection_name
+  type: string
+- name: keyvault_name
+  type: string
+- name: acr_connect_name
+  type: string  
+- name: src_repo_name
+  type: string
+- name: dest_branch
+  type: string  
+- name: target_environment
+  type: string
+- name: config_storage_account_name
+  type: string
+
+steps:
+
+  - task: AzureKeyVault@2
+    name: get_values_from_keyvault
+    inputs:
+      azureSubscription: ${{ parameters.azure_connection_name }}
+      KeyVaultName: ${{ parameters.keyvault_name }}
+      SecretsFilter: '*'
+      RunAsPreJob: true
+
+# Rebuild all the images with the new tag
+  - task: Bash@3
+    displayName: 'Update IMAGE_TAG to stageBuildTag'
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+          sed "s/IMAGE_TAG/${{ parameters.stageBuildTag }}/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.template.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
+
+# Bake the kustomize files 
+  - task: KubernetesManifest@0
+    name: bake
+    displayName: Bake K8s manifests from kustomization path
+    inputs:
+      action: bake
+      renderType: kustomize
+      kustomizationPath:  $(workingDir)/.deployment/manifests/kustomize/overlay
+
+# Display the baked file 
+  - task: Bash@3
+    name: display_bake
+    displayName: Display baked Manifest
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo "Manifest Bundle: $(bake.manifestsBundle)"
+        cat $(bake.manifestsBundle)
+
+#   a. Checkout GitOps Repo
+#   b. Create a branch named {{ parameters.dest_branch}}
+#   c. Create a folder with {{ parameters.appName}} 
+#   d. Copy kustomize folder from source repo to the folder created in step c
+#   e. Commit the changes to the branch created in step b
+#   f. Create a PR to the branch created in step b 
+
+  # Commit baked file to a Branch on ArcGitOps Repo
+  - task: Bash@3
+    displayName: 'Stage to GitOps repo'
+    name: commit_baked_yaml
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+
+          pr_user_name="Jay Padmanabhan"
+          pr_user_email="jay_padmanabhan@hotmail.com"
+
+          git config --global user.email $pr_user_email
+          git config --global user.name $pr_user_name
+          set -eo pipefail  # fail on error
+
+          echo "GITOPSREPONAME=$(GITOPSREPONAME)"
+          echo "GITOPSURL=$(GITOPSURL)"
+
+          GITTOKEN=$(GITTOKEN)
+          GITCLASSICTOKEN=$(GITCLASSICTOKEN)
+          
+          echo "dest_branch=${{ parameters.dest_branch }}"
+          echo "GITOPSDESTFOLDER=$GITOPSDESTFOLDER"
+          echo "CLONEABLEGITOPSREPOURL=$(CLONEABLEGITOPSREPOURL)"
+          git clone $(CLONEABLEGITOPSREPOURL) 
+          echo "git clone $(CLONEABLEGITOPSREPOURL)"
+          echo "cd $(GITOPSREPONAME)"
+          cd "$(GITOPSREPONAME)"
+          pwd
+          git branch ${{ parameters.dest_branch }}
+          git checkout ${{ parameters.dest_branch }}       
+          echo "git status"
+          git status
+
+          # Copy kustomize files with overlay
+          cp -r $(workingDir)/.deployment/manifests/kustomize "./$(GITOPSDESTFOLDER)"
+          # Delete the config files in target directory
+          rm -rf "./$(GITOPSDESTFOLDER)/kustomize/overlay/kustomization.yaml"
+          ls -lR ./$(GITOPSDESTFOLDER)
+
+          git add -A
+          echo "git status"
+          git status
+          git commit -m "deployment ${{ parameters.dest_branch}}"
+          echo "Push to the deploy branch ${{ parameters.dest_branch}}"
+          echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}"
+          git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}
+
+          # Create a PR 
+          echo "Create a PR to ${{ parameters.dest_branch}}"
+          
+          export GITHUB_TOKEN=$(GITCLASSICTOKEN)
+          pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head ${{ parameters.dest_branch }} --title "GitOps Deployment $(imageTag)" --body "Deploy to ${{ parameters.dest_branch }}")
+          echo $pr_response
+          if "$AUTO_MERGE" == "Y"; then
+              pr_num="${pr_response##*pull/}"
+              echo $pr_num
+              gh pr merge $pr_num -m -d --repo $(CLONEABLEGITOPSREPOURL)
+          fi
+
+
+         

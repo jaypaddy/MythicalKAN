@@ -9,11 +9,12 @@ data:
   EDGE_INFERENCE_URL: "http://mythicalscissorsobjdetectionsvc:8080/image"
   EDGE_BLOB_CONTAINER_NAME: "scissors"
   LOGGING_LEVEL: INFO
-  APP_NAME: mythicalscissors
   SCOPE_KEYS: plant,edge,line,workload
   SCOPE_VALUES: "FLOWERMOUND,MYTHICALAKSEE,FM407,MYTHICALSCISSORS"
   PROMETHEUS_PORT: "8081"
   SLEEP_TIME: "1"
+  APP_NAME: mythicalscissors
+  APP_VERSION:
 
 ---
 apiVersion: v1

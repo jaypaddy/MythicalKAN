@@ -10,6 +10,10 @@ variables:
   azure_connection_name: "Mythical-JAYPADDY-LAB"
   keyvault_name: "mythicalarcopskv"
   acr_connect_name: "mythicalconACRServiceConnection"
+  app_name: "scissors"
+  app_version: "0.0.0"
+  line: "FM407" 
+  plant: "FLOWERMOUND"
 
   #ActionRules
   actionrules_project_name: "MythicalScissorsActionRules"
@@ -25,3 +29,6 @@ variables:
 
   target_environment: "dev"
   config_storage_account_name: "mythicaldigitalfactory"
+
+  # Staging Release
+  stageBuildTag: 'REL-$(Build.BuildId)'

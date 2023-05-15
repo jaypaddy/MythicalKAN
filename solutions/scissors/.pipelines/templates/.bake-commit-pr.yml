@@ -1,0 +1,213 @@
+                             
+parameters:
+- name: imageTag
+  type: string
+- name: workingDir
+  type: string
+- name: azure_connection_name
+  type: string
+- name: keyvault_name
+  type: string
+- name: acr_connect_name
+  type: string  
+- name: src_repo_name
+  type: string
+- name: dest_branch
+  type: string  
+- name: target_environment
+  type: string
+- name: config_storage_account_name
+  type: string
+
+steps:
+
+  - task: AzureKeyVault@2
+    name: get_values_from_keyvault
+    inputs:
+      azureSubscription: ${{ parameters.azure_connection_name }}
+      KeyVaultName: ${{ parameters.keyvault_name }}
+      SecretsFilter: '*'
+      RunAsPreJob: true
+
+  - task: AzureCLI@2
+    displayName: 'Get config by Target Environment from Config Svc (BlobStorage)'
+    name: get_target_config
+    inputs:
+      azureSubscription: ${{ parameters.azure_connection_name }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+          az storage blob download -f config.json   \
+            --account-name ${{ parameters.config_storage_account_name }} \
+            --container-name ${{ parameters.target_environment }} \
+            -n config.json
+ 
+# Update configMap.yaml with values from KeyVault
+# For now KeyVault as a store. In the future this will be replaced with a REST 
+# endpoint that will provide the values for the configMap based on an Identifier 
+# Update kustomization.yaml so we have the final manifest
+  - task: Bash@3
+    displayName: 'Update ConfigMap template file to build ConfigMap values'
+    inputs:
+      targetType: 'inline'
+      script: |      
+          #!/bin/bash
+
+          cat config.json
+
+          APP_NAME=$(jq .APP_NAME config.json)
+          CLOUD_BLOB_CONN_STRING=$(jq .CLOUD_BLOB_CONN_STRING config.json)
+          EDGE_BLOB_CONN_STRING=$(jq .EDGE_BLOB_CONN_STRING config.json)
+          EDGE_BLOB_CONTAINER_NAME=$(jq .EDGE_BLOB_CONTAINER_NAME config.json)
+          EDGE_INFERENCE_URL=$(jq .EDGE_INFERENCE_URL config.json)
+          LOGGING_LEVEL=$(jq .LOGGING_LEVEL config.json)
+          PROMETHEUS_PORT=$(jq .PROMETHEUS_PORT config.json)
+          RTSP_URL=$(jq .RTSP_URL config.json)
+          SCOPE_KEYS=$(jq .SCOPE_KEYS config.json)
+          SCOPE_VALUES=$(jq .SCOPE_VALUES config.json)
+          SLEEP_TIME=$(jq .SLEEP_TIME config.json)
+
+          sed -e "s|\"APP_NAME\"|$APP_NAME|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.1.yaml
+
+          sed -e "s|\"CLOUD_BLOB_CONN_STRING\"|$CLOUD_BLOB_CONN_STRING|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.1.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.2.yaml
+
+          sed -e "s|\"EDGE_BLOB_CONN_STRING\"|$EDGE_BLOB_CONN_STRING|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.1.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.2.yaml
+
+          sed -e "s|\"EDGE_BLOB_CONTAINER_NAME\"|$EDGE_BLOB_CONTAINER_NAME|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.2.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.3.yaml 
+
+          sed -e "s|\"EDGE_INFERENCE_URL\"|$EDGE_INFERENCE_URL|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.3.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.4.yaml 
+
+          sed -e "s|\"LOGGING_LEVEL\"|$LOGGING_LEVEL|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.4.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.5.yaml  
+
+          sed -e "s|\"PROMETHEUS_PORT\"|$PROMETHEUS_PORT|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.5.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.6.yaml  
+
+          sed -e "s|\"RTSP_URL\"|$RTSP_URL|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.6.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.7.yaml                                                                              
+
+          sed -e "s|\"SCOPE_KEYS\"|$SCOPE_KEYS|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.7.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.8.yaml                                                                              
+
+          sed -e "s|\"SCOPE_VALUES\"|$SCOPE_VALUES|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.8.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.9.yaml 
+
+          sed -e "s|\"SLEEP_TIME\"|$SCOPE_VALUES|g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.9.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+
+          echo "Updated ConfigMap.yaml with values from BlobStorage"
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+
+     
+
+  - task: Bash@3
+    displayName: 'Update Kustomization template file with ImageTag values'
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+          sed "s/IMAGE_TAG/${{ parameters.imageTag }}/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.template.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
+          cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
+
+
+  - task: KubernetesManifest@0
+    name: bake
+    displayName: Bake K8s manifests from kustomization path
+    inputs:
+      action: bake
+      renderType: kustomize
+      kustomizationPath:  $(workingDir)/.deployment/manifests/kustomize/overlay
+
+  - task: Bash@3
+    name: display_bake
+    displayName: Display baked Manifest
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo "Manifest Bundle: $(bake.manifestsBundle)"
+        cat $(bake.manifestsBundle)
+
+
+
+  # Commit baked file to a Branch on ArcGitOps Repo
+  - task: Bash@3
+    displayName: 'Post a PR on GitOps repo'
+    name: commit_baked_yaml
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+
+          pr_user_name="Jay Padmanabhan"
+          pr_user_email="jay_padmanabhan@hotmail.com"
+
+          git config --global user.email $pr_user_email
+          git config --global user.name $pr_user_name
+          set -eo pipefail  # fail on error
+
+          echo "GITOPSREPONAME=$(GITOPSREPONAME)"
+          echo "GITOPSURL=$(GITOPSURL)"
+
+          GITTOKEN=$(GITTOKEN)
+          GITCLASSICTOKEN=$(GITCLASSICTOKEN)
+          
+          #dest_branch="$(src_repo_name)/BUILD/$(imageTag)"
+          echo "dest_branch=${{ parameters.dest_branch }}"
+          
+          echo "GITOPSDESTFOLDER=$GITOPSDESTFOLDER"
+          
+          echo "CLONEABLEGITOPSREPOURL=$(CLONEABLEGITOPSREPOURL)"
+          git clone $(CLONEABLEGITOPSREPOURL) 
+          echo "git clone $(CLONEABLEGITOPSREPOURL)"
+          echo "cd $(GITOPSREPONAME)"
+          cd "$(GITOPSREPONAME)"
+          pwd
+          git branch ${{ parameters.dest_branch }}
+          git checkout ${{ parameters.dest_branch }}       
+          echo "git status"
+          git status
+
+          # Copy baked manifest bundle into readytodeploy directory
+          cp $(bake.manifestsBundle) "./$(GITOPSDESTFOLDER)"
+          echo "Displaying the final Kustomized manifest"
+          ls -l ./$(GITOPSDESTFOLDER)
+          git add -A
+          echo "git status"
+          git status
+          git commit -m "deployment ${{ parameters.dest_branch}}"
+          echo "Push to the deploy branch ${{ parameters.dest_branch}}"
+          echo "git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}"
+          git push --set-upstream $(CLONEABLEGITOPSREPOURL) ${{ parameters.dest_branch}}
+
+          # Create a PR 
+          echo "Create a PR to ${{ parameters.dest_branch}}"
+          
+          export GITHUB_TOKEN=$(GITCLASSICTOKEN)
+          pr_response=$(gh pr create --repo $(CLONEABLEGITOPSREPOURL) --base main --head ${{ parameters.dest_branch }} --title "GitOps Deployment $(imageTag)" --body "Deploy to ${{ parameters.dest_branch }}")
+          echo $pr_response
+          if "$AUTO_MERGE" == "Y"; then
+              pr_num="${pr_response##*pull/}"
+              echo $pr_num
+              gh pr merge $pr_num -m -d --repo $(CLONEABLEGITOPSREPOURL)
+          fi
+
+
+         

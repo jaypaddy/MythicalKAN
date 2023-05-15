@@ -55,17 +55,22 @@ steps:
 
           cat config.json
 
-          APP_NAME=$(jq .APP_NAME config.json)
-          CLOUD_BLOB_CONN_STRING=$(jq .CLOUD_BLOB_CONN_STRING config.json)
-          EDGE_BLOB_CONN_STRING=$(jq .EDGE_BLOB_CONN_STRING config.json)
-          EDGE_BLOB_CONTAINER_NAME=$(jq .EDGE_BLOB_CONTAINER_NAME config.json)
-          EDGE_INFERENCE_URL=$(jq .EDGE_INFERENCE_URL config.json)
-          LOGGING_LEVEL=$(jq .LOGGING_LEVEL config.json)
-          PROMETHEUS_PORT=$(jq .PROMETHEUS_PORT config.json)
-          RTSP_URL=$(jq .RTSP_URL config.json)
-          SCOPE_KEYS=$(jq .SCOPE_KEYS config.json)
-          SCOPE_VALUES=$(jq .SCOPE_VALUES config.json)
-          SLEEP_TIME=$(jq .SLEEP_TIME config.json)
+          APP_NAME=$(jq .KUBE.APP_NAME config.json)
+          APP_VERSION=$(jq .KUBE.APP_VERSION config.json)
+          ENVIRONMENT=$(jq .KUBE.ENVIRONMENT config.json)
+          PLANT=$(jq .KUBE.PLANT config.json)
+          LINE=$(jq .KUBE.LINE config.json)
+
+          CLOUD_BLOB_CONN_STRING=$(jq .APP.CLOUD_BLOB_CONN_STRING config.json)
+          EDGE_BLOB_CONN_STRING=$(jq .APP.EDGE_BLOB_CONN_STRING config.json)
+          EDGE_BLOB_CONTAINER_NAME=$(jq .APP.EDGE_BLOB_CONTAINER_NAME config.json)
+          EDGE_INFERENCE_URL=$(jq .APP.EDGE_INFERENCE_URL config.json)
+          LOGGING_LEVEL=$(jq .APP.LOGGING_LEVEL config.json)
+          PROMETHEUS_PORT=$(jq .APP.PROMETHEUS_PORT config.json)
+          RTSP_URL=$(jq .APP.RTSP_URL config.json)
+          SCOPE_KEYS=$(jq .APP.SCOPE_KEYS config.json)
+          SCOPE_VALUES=$(jq .APP.SCOPE_VALUES config.json)
+          SLEEP_TIME=$(jq .APP.SLEEP_TIME config.json)
 
           sed -e "s|\"APP_NAME\"|$APP_NAME|g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
@@ -107,27 +112,68 @@ steps:
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.8.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.9.yaml 
 
-          sed -e "s|\"SLEEP_TIME\"|$SLEEP_TIME|g" \
+          sed -e "s|\"SLEEP_TIME\"|$SCOPE_VALUES|g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.9.yaml \
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
 
           echo "Updated ConfigMap.yaml with values from BlobStorage"
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
 
-     
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.9.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.8.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.7.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.6.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.5.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.4.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.3.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.2.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.1.yaml
+
+
+          # Update environment variables
+          echo "##vso[task.setvariable variable=APP_NAME]$APP_NAME"            
+          echo "##vso[task.setvariable variable=APP_VERSION]$APP_VERSION"            
+          echo "##vso[task.setvariable variable=ENVIRONMENT]$ENVIRONMENT"            
+          echo "##vso[task.setvariable variable=PLANT]$PLANT"            
+          echo "##vso[task.setvariable variable=LINE]$LINE"            
 
   - task: Bash@3
-    displayName: 'Update Kustomization template file with ImageTag values'
+    displayName: 'Update Kustomization template file with ImageTag & Label values'
     inputs:
       targetType: 'inline'
       script: |
           #!/bin/bash
           sed "s/IMAGE_TAG/${{ parameters.imageTag }}/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.template.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.1.yaml
+          
+          sed "s/APP_NAME/$(APP_NAME)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.1.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.2.yaml
+
+          sed "s/APP_VERSION/$(APP_VERSION)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.1.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.2.yaml
+
+          sed "s/ENVIRONMENT/$(ENVIRONMENT)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.1.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.2.yaml
+
+          sed "s/PLANT/$(PLANT)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.2.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.3.yaml
+
+          sed "s/LINE/$(LINE)/g" \
+              $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.3.yaml \
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.4.yaml
+
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
 
-
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.4.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.3.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.2.yaml
+          rm $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.1.yaml
+          
   - task: KubernetesManifest@0
     name: bake
     displayName: Bake K8s manifests from kustomization path

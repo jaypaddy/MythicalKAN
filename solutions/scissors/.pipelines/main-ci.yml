@@ -11,11 +11,11 @@ pool:
 
 stages:
 
-- stage: bake_commit_pr_manifest
   jobs:
-  - job: execute_bake_commit_pr_to_gitopsrepo
+
+  - job: execute_build_bake_commit_pr_to_gitopsrepo
     steps:
-    - template: ./templates/bake-commit-pr.yml
+    - template: ./templates/build-bake-commit-pr.yml
       parameters:
           imageTag: TEST
           workingDir: ${{ variables.workingDir }}

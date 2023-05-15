@@ -9,10 +9,11 @@ resources:
 
 namespace: mythicalscissors-ns
 commonLabels:
-  app: mythicalscissors
-  environment: dev
-  line: jp1913 
-  plant: mythicalaksee
+  app: APP_NAME
+  appversion: APP_VERSION
+  environment: ENVIRONMENT
+  line: LINE 
+  plant: PLANT
 
 secretGenerator:
 - files:

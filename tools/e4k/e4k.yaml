@@ -1,0 +1,39 @@
+apiVersion: az-edge.com/v1alpha1
+kind: Broker
+metadata:
+  name: "e4kbroker"
+  namespace: e4k-ns
+spec:
+  mode: auto
+  image:
+    pullPolicy: Always
+    repository: e4kpreview.azurecr.io/dmqtt-pod
+    tag: 0.3.0
+  authImage:
+    pullPolicy: Always
+    repository: e4kpreview.azurecr.io/dmqtt-authentication
+    tag: 0.3.0
+---
+apiVersion: az-edge.com/v1alpha1
+kind: BrokerListener
+metadata:
+  name: "e4k-tls-listenerr"
+  namespace: e4k-ns
+spec:
+  brokerRef: "e4kbroker"
+  authenticationEnabled: false
+  authorizationEnabled: false
+  port: 1883
+---
+apiVersion: az-edge.com/v1alpha1
+kind: BrokerDiagnostic
+metadata:
+  name: "e4k-diag"
+  namespace: e4k-ns
+spec:
+  brokerRef: "e4kbroker"
+  diagnosticServiceEndpoint: azedge-diagnostics-service:9700
+  enableMetrics: true  
+  enableTracing: true  
+  logLevel: debug,hyper=off,kube_client=off,tower=off,conhash=off,h2=off
+  enableSelfCheck: false
