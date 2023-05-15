@@ -165,11 +165,10 @@ steps:
 
           sed "s/LINE/$(LINE)/g" \
               $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.3.yaml \
-                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.4.yaml
+                > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
 
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
 
-          rm $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.4.yaml
           rm $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.3.yaml
           rm $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.2.yaml
           rm $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.1.yaml
