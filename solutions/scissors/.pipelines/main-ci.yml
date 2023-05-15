@@ -10,9 +10,9 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
+- stage: bake_commit_pr_manifest
 
   jobs:
-
   - job: execute_build_bake_commit_pr_to_gitopsrepo
     steps:
     - template: ./templates/build-bake-commit-pr.yml

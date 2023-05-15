@@ -191,8 +191,6 @@ steps:
         echo "Manifest Bundle: $(bake.manifestsBundle)"
         cat $(bake.manifestsBundle)
 
-
-
   # Commit baked file to a Branch on ArcGitOps Repo
   - task: Bash@3
     displayName: 'Post a PR on GitOps repo'
