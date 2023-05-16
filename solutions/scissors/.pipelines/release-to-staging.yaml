@@ -12,7 +12,10 @@
 #   f. Create a PR to the branch created in step b 
 
 trigger:
-- none
+  branches:
+    include:
+      - ./templates/release-to-staging.yaml
+      - ./templates/build-copy-commit-pr.yml
 
 variables:
 - template: variables.yml
@@ -22,9 +25,9 @@ pool:
 
 stages:
 
-- stage: bake_commit_pr_manifest
+- stage: build_copy_pr_to_gitopsrepo
   jobs:
-  - job: execute_bake_commit_pr_to_gitopsrepo
+  - job: execute_build_copy_pr_to_gitopsrepo
     steps:
     - template: ./templates/build-copy-commit-pr.yml
       parameters:

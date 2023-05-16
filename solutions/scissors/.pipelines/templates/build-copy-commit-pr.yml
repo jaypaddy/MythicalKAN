@@ -41,6 +41,15 @@ steps:
                 > $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
           cat $(workingDir)/.deployment/manifests/kustomize/overlay/kustomization.yaml
 
+  - task: Bash@3
+    displayName: 'Create ConfigMap from Template'
+    inputs:
+      targetType: 'inline'
+      script: |
+          #!/bin/bash
+          cp $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.template.yaml \
+                 $(workingDir)/.deployment/manifests/kustomize/overlay/configMap.yaml
+
 # Bake the kustomize files 
   - task: KubernetesManifest@0
     name: bake
