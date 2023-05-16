@@ -99,7 +99,7 @@ steps:
           GITCLASSICTOKEN=$(GITCLASSICTOKEN)
           
           echo "dest_branch=${{ parameters.dest_branch }}"
-          echo "GITOPSDESTFOLDER=$GITOPSDESTFOLDER"
+          echo "GITOPSDESTFOLDER=$(GITOPSDESTFOLDER)"
           echo "CLONEABLEGITOPSREPOURL=$(CLONEABLEGITOPSREPOURL)"
           git clone $(CLONEABLEGITOPSREPOURL) 
           echo "git clone $(CLONEABLEGITOPSREPOURL)"
