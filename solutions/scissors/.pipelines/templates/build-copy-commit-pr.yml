@@ -114,7 +114,7 @@ steps:
           # Copy kustomize files with overlay
           cp -r $(workingDir)/.deployment/manifests/kustomize "./$(GITOPSDESTFOLDER)"
           # Delete the config files in target directory
-          rm -rf "./$(GITOPSDESTFOLDER)/kustomize/overlay/kustomization.yaml"
+          rm  "./$(GITOPSDESTFOLDER)/kustomize/overlay/kustomization.yaml"
           ls -lR ./$(GITOPSDESTFOLDER)
 
           git add -A
