@@ -34,6 +34,6 @@ stages:
           keyvault_name: ${{ variables.keyvault_name }}  
           acr_connect_name: $${{ variables.acr_connect_name}}        
           src_repo_name: ${{ variables.src_repo_name }}  
-          dest_branch:  "${{ variable.stageBuildTag}}/${{ variables.app_name}}/${{ variables.appVersion }}/${{ variables.imageTag }}"
+          dest_branch:  "${{ variables.stageBuildTag}}/${{ variables.app_name}}/${{ variables.appVersion }}/${{ variables.imageTag }}"
           target_environment: ${{ variables.target_environment }}
           config_storage_account_name: ${{ variables.config_storage_account_name }}
